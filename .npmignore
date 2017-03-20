@@ -1,0 +1,7 @@
+demo
+docs
+.babelrc
+.eslint*
+.editorconfig
+.npmignore
+webpack.*
