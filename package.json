@@ -1,6 +1,6 @@
 {
   "name": "redux-autoloader",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "A higher order component for declarative data loading in React and Redux.",
   "main": "./lib/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/woltapp/react-autoloader"
+    "url": "https://github.com/woltapp/redux-autoloader"
   },
   "keywords": [
     "react",
