@@ -7,10 +7,26 @@
     "build": "webpack -p --config webpack.config.js --progress --colors",
     "test": "cross-env NODE_ENV=test karma start",
     "test:watch": "npm run test -- --singleRun=false",
-    "demo": "webpack-dev-server --config webpack.demo.config.js --content-base demo/"
+    "demo": "webpack-dev-server --config webpack.demo.config.js --content-base demo/",
+    "prepublish": "npm run build",
+    "start": "npm run demo"
   },
-  "author": "Wolt Enterprises",
+  "author": "nygardk",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/woltapp/react-autoloader"
+  },
+  "keywords": [
+    "react",
+    "redux",
+    "loader",
+    "auto",
+    "refresh",
+    "data",
+    "component",
+    "react-component"
+  ],
   "peerDependencies": {
     "react": "^15.0.0",
     "react-redux": "^4.3.0 || ^5.0.0-beta",
