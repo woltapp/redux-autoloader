@@ -48,7 +48,7 @@ describe('dataLoaderFlow', () => {
   describe('on INITIALIZE action', () => {
     it('should start watchManualRefresh', () => {
       gen.next(initializeAction);
-      expect(gen.next(initializeAction).value).to.eql(fork(watchManualRefresh, 'test-loader'));
+      expect(gen.next(initializeAction).value).to.eql(fork(watchManualRefresh, initializeAction));
     });
   });
 
@@ -81,7 +81,7 @@ describe('dataLoaderFlow', () => {
 
     it('should fork watchManualRefresh if it is not running', () => {
       gen.next(stopRefreshAction);
-      expect(gen.next(stopRefreshAction).value).to.eql(fork(watchManualRefresh, 'test-loader'));
+      expect(gen.next(stopRefreshAction).value).to.eql(fork(watchManualRefresh, stopRefreshAction));
     });
 
     it('should not fork watchManualRefresh if it is already initialized', () => {
@@ -91,7 +91,7 @@ describe('dataLoaderFlow', () => {
       gen.next(initializeAction);
       gen.next(mockLoaderTask);
       gen.next(stopRefreshAction);
-      expect(gen.next(stopRefreshAction).value).to.not.eql(fork(watchManualRefresh, 'test-loader'));
+      expect(gen.next(stopRefreshAction).value).to.not.eql(fork(watchManualRefresh, stopRefreshAction));
     });
 
     it('should cancel autoRefresh task it is running', () => {

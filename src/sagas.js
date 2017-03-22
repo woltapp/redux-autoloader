@@ -36,13 +36,12 @@ export function* autoRefresh(action) {
   }
 }
 
-export function* watchManualRefresh(loaderName) {
+export function* watchManualRefresh(action) {
   while (true) {
-    const action = yield take(MANUAL_REFRESH);
+    const manualRefreshAction = yield take(act =>
+      act.type === MANUAL_REFRESH && act.meta.loader === action.meta.loader);
 
-    if (loaderName === action.meta.loader) {
-      yield call(fetchData, action);
-    }
+    yield call(fetchData, manualRefreshAction);
   }
 }
 
@@ -52,20 +51,27 @@ export function* dataLoaderFlow() {
   while (true) {
     const action = yield take([START_REFRESH, STOP_REFRESH, INITIALIZE]);
 
-    const loaderTask = tasks[action.meta.loader];
+    const loaderTasks = tasks[action.meta.loader] || {};
 
-    if (action.type === START_REFRESH && (!loaderTask || loaderTask.name !== 'autoRefresh')) {
-      if (loaderTask) {
-        yield cancel(loaderTask);
+    if (!tasks[action.meta.loader]) {
+      tasks[action.meta.loader] = {};
+    }
+
+    if (action.type === START_REFRESH && !loaderTasks.autoRefresh) {
+      if (loaderTasks.watchManualRefresh) {
+        yield cancel(loaderTasks.watchManualRefresh);
+        delete loaderTasks.watchManualRefresh;
       }
 
-      tasks[action.meta.loader] = yield fork(autoRefresh, action);
-    } else if (!loaderTask || loaderTask.name !== 'watchManualRefresh') {
-      if (loaderTask) {
-        yield cancel(loaderTask);
+      tasks[action.meta.loader].autoRefresh = yield fork(autoRefresh, action);
+    } else if (!loaderTasks.watchManualRefresh) {
+      if (loaderTasks.autoRefresh) {
+        yield cancel(loaderTasks.autoRefresh);
+        delete loaderTasks.autoRefresh;
       }
 
-      tasks[action.meta.loader] = yield fork(watchManualRefresh, action.meta.loader);
+      tasks[action.meta.loader].watchManualRefresh =
+        yield fork(watchManualRefresh, action);
     }
   }
 }
