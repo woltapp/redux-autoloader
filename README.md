@@ -71,6 +71,9 @@ and cache invalidation.
 #### Super simple data loader
 
 ```jsx
+import { reduxAutoloader } from 'redux-autoloader';
+...
+
 const ExampleComponent = ({
   data,       // provided by reduxAutoloader
   error,      // provided by reduxAutoloader
