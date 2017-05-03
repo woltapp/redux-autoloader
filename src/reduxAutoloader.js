@@ -18,10 +18,10 @@ import {
   isInitialized,
   isLoading,
   isRefreshing,
-  getData,
   getDataReceivedAt,
   getError,
   getErrorReceivedAt,
+  createMemoizedGetData,
 } from './selectors';
 
 function cacheIsStale(dataReceivedAt, expiresIn) {
@@ -51,6 +51,8 @@ export default function reduxAutoloader({
   if (apiCall) {
     assert(apiCall, 'apiCall must be a function');
   }
+
+  const getData = createMemoizedGetData();
 
   const getReducerName = typeof name === 'function' ? name : () => name;
 

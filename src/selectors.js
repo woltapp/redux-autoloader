@@ -21,3 +21,22 @@ export const getError = (state, loaderName) =>
 
 export const getErrorReceivedAt = (state, loaderName) =>
   getLoaderState(state)[loaderName].errorReceivedAt;
+
+export const createMemoizedGetData = () => {
+  let memData;
+  let memDataReceivedAt;
+
+  return (state, loaderName) => {
+    const data = getData(state, loaderName);
+    const dataReceivedAt = getDataReceivedAt(state, loaderName);
+
+    if (memDataReceivedAt === dataReceivedAt) {
+      return memData;
+    }
+
+    memData = data;
+    memDataReceivedAt = dataReceivedAt;
+
+    return data;
+  };
+};
