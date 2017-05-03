@@ -2,7 +2,8 @@
   react/prefer-stateless-function,
   react/forbid-prop-types
 */
-import React, { PureComponent, PropTypes, createElement } from 'react';
+import React, { PureComponent, createElement } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import getDisplayName from 'react-display-name';
 

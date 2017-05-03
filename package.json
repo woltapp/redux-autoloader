@@ -76,6 +76,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.10.0",
+    "prop-types": "15.5.8",
     "react-display-name": "^0.2.0"
   }
 }
