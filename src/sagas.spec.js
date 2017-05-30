@@ -91,7 +91,8 @@ describe('dataLoaderFlow', () => {
       gen.next(initializeAction);
       gen.next(mockLoaderTask);
       gen.next(stopRefreshAction);
-      expect(gen.next(stopRefreshAction).value).to.not.eql(fork(watchManualRefresh, stopRefreshAction));
+      expect(gen.next(stopRefreshAction).value)
+        .to.not.eql(fork(watchManualRefresh, stopRefreshAction));
     });
 
     it('should cancel autoRefresh task it is running', () => {

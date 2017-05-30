@@ -13,6 +13,7 @@
   "rules": {
     "react/jsx-filename-extension": 0,
     "react/no-multi-comp": 0,
-    "import/no-extraneous-dependencies": 0
+    "import/no-extraneous-dependencies": 0,
+    "react/require-default-props": 0
   }
 }
