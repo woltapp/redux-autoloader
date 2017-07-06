@@ -15,13 +15,16 @@ import {
 } from './actions';
 
 export function* fetchData(action) {
-  yield put(fetchDataRequest(action.meta.loader, action.payload.apiCall, action.payload.props));
+  yield put(fetchDataRequest(action.meta.loader, {
+    apiCall: action.payload.apiCall,
+    props: action.payload.props,
+  }));
 
   try {
     const data = yield call(action.payload.apiCall, action.payload.props);
-    yield put(fetchDataSuccess(action.meta.loader, data));
-  } catch (e) {
-    yield put(fetchDataFailure(action.meta.loader, e));
+    yield put(fetchDataSuccess(action.meta.loader, { data }));
+  } catch (err) {
+    yield put(fetchDataFailure(action.meta.loader, { error: err }));
   }
 }
 

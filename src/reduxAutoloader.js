@@ -143,19 +143,18 @@ export default function reduxAutoloader({
       }
 
       refresh = () => {
-        this.props.manualRefresh(
-          getReducerName(this.props),
+        this.props.manualRefresh(getReducerName(this.props), {
           apiCall,
-          this.getMappedProps(this.props),
-        );
+          props: this.getMappedProps(this.props),
+        });
       }
 
       startAutoRefresh = (newTimeout) => {
-        this.props.startRefresh(
-          getReducerName(this.props),
-          apiCall, newTimeout || autoRefreshInterval,
-          this.getMappedProps(this.props),
-        );
+        this.props.startRefresh(getReducerName(this.props), {
+          apiCall,
+          timeout: newTimeout || autoRefreshInterval,
+          props: this.getMappedProps(this.props),
+        });
       }
 
       stopAutoRefresh = () => {
@@ -183,20 +182,18 @@ export default function reduxAutoloader({
           (cacheExpiresIn && cacheIsStale(dataReceivedAt, cacheExpiresIn));
 
         if (apiCall && autoRefreshInterval) {
-          props.startRefresh(
-            getReducerName(props),
+          props.startRefresh(getReducerName(props), {
             apiCall,
-            autoRefreshInterval,
-            this.getMappedProps(props),
-          );
+            timeout: autoRefreshInterval,
+            props: this.getMappedProps(props),
+          });
         }
 
         if (apiCall && shouldReload) {
-          props.manualRefresh(
-            getReducerName(props),
+          props.manualRefresh(getReducerName(props), {
             apiCall,
-            this.getMappedProps(props),
-          );
+            props: this.getMappedProps(props),
+          });
         }
       }
 

@@ -169,7 +169,7 @@ describe('reduxAutoloader', () => {
         <Decorated />
       </Provider>,
     );
-    store.dispatch(fetchDataSuccess('test-loader', 'test-result-data'));
+    store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
     clock.tick(500);
     TestUtils.renderIntoDocument(
       <Provider store={store}>
@@ -199,7 +199,7 @@ describe('reduxAutoloader', () => {
         <Decorated />
       </Provider>,
     );
-    store.dispatch(fetchDataSuccess('test-loader', 'test-result-data'));
+    store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
     clock.tick(1100);
     TestUtils.renderIntoDocument(
       <Provider store={store}>
@@ -233,7 +233,7 @@ describe('reduxAutoloader', () => {
       </Provider>,
     );
 
-    store.dispatch(fetchDataSuccess('test-loader', 'test-result-data'));
+    store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
 
     clock.tick(1100);
 
@@ -245,7 +245,11 @@ describe('reduxAutoloader', () => {
 
     expect(fakeApi.callCount).to.equal(0);
 
-    store.dispatch(startRefresh('test-loader', fakeApi, 1000, {}));
+    store.dispatch(startRefresh('test-loader', {
+      apiCall: fakeApi,
+      timeout: 1000,
+      props: {},
+    }));
 
     expect(fakeApi.callCount).to.equal(1);
 
@@ -358,7 +362,7 @@ describe('reduxAutoloader', () => {
       );
 
       // simulate promise resolve
-      store.dispatch(fetchDataSuccess('test-loader', 'test-result-data'));
+      store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
 
       const props = TestUtils.findRenderedComponentWithType(dom, TestComponent).props;
 

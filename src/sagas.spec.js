@@ -25,9 +25,12 @@ describe('fetchData', () => {
   const mockProps = { testProp: 'test' };
 
   it('should call api', () => {
-    const gen = fetchData(manualRefresh('test-loader', fakeApi, mockProps));
+    const gen = fetchData(manualRefresh('test-loader', { apiCall: fakeApi, props: mockProps }));
 
-    expect(gen.next().value).to.eql(put(fetchDataRequest('test-loader', fakeApi, mockProps)));
+    expect(gen.next().value).to.eql(put(fetchDataRequest('test-loader', {
+      apiCall: fakeApi,
+      props: mockProps
+    })));
     expect(gen.next().value).to.eql(call(fakeApi, mockProps));
   });
 });
