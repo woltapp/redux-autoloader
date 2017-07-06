@@ -6,18 +6,16 @@ import {
   fetchDataRequest,
   startRefresh,
   stopRefresh,
-  initialize,
 } from './actions';
 import {
   START_REFRESH,
   STOP_REFRESH,
-  INITIALIZE,
+  MANUAL_REFRESH,
 } from './actionTypes';
 import {
   fetchData,
   dataLoaderFlow,
   autoRefresh,
-  watchManualRefresh,
 } from './sagas';
 
 describe('fetchData', () => {
@@ -38,9 +36,9 @@ describe('fetchData', () => {
 describe('dataLoaderFlow', () => {
   const fakeApi = sinon.stub().returns(Promise.resolve('testresult'));
   const mockProps = { testProp: 'test' };
-  const startRefreshAction = startRefresh('test-loader', fakeApi, mockProps);
-  const stopRefreshAction = stopRefresh('test-loader', fakeApi, mockProps);
-  const initializeAction = initialize('test-loader');
+  const startRefreshAction = startRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
+  const stopRefreshAction = stopRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
+  const manualRefreshAction = manualRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
 
   let gen;
 
@@ -48,54 +46,22 @@ describe('dataLoaderFlow', () => {
     gen = dataLoaderFlow();
   });
 
-  describe('on INITIALIZE action', () => {
-    it('should start watchManualRefresh', () => {
-      gen.next(initializeAction);
-      expect(gen.next(initializeAction).value).to.eql(fork(watchManualRefresh, initializeAction));
-    });
-  });
-
   describe('on START_REFRESH action', () => {
     it('should take START_REFRESH action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, INITIALIZE]));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]));
     });
 
     it('should fork autoRefresh', () => {
       gen.next(startRefreshAction);
       expect(gen.next(startRefreshAction).value).to.eql(fork(autoRefresh, startRefreshAction));
     });
-
-    it('should cancel existing watchManualRefresh when initialized', () => {
-      const mockLoaderTask = createMockTask();
-      mockLoaderTask.name = 'watchManualRefresh';
-      gen.next(initializeAction);
-      gen.next(initializeAction);
-      gen.next(mockLoaderTask);
-      expect(gen.next(startRefreshAction).value).to.eql(cancel(mockLoaderTask));
-    });
   });
 
   describe('on STOP_REFRESH action', () => {
     it('should take STOP_REFRESH action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, INITIALIZE]));
-    });
-
-    it('should fork watchManualRefresh if it is not running', () => {
-      gen.next(stopRefreshAction);
-      expect(gen.next(stopRefreshAction).value).to.eql(fork(watchManualRefresh, stopRefreshAction));
-    });
-
-    it('should not fork watchManualRefresh if it is already initialized', () => {
-      const mockLoaderTask = createMockTask();
-      mockLoaderTask.name = 'watchManualRefresh';
-      gen.next(initializeAction);
-      gen.next(initializeAction);
-      gen.next(mockLoaderTask);
-      gen.next(stopRefreshAction);
-      expect(gen.next(stopRefreshAction).value)
-        .to.not.eql(fork(watchManualRefresh, stopRefreshAction));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]));
     });
 
     it('should cancel autoRefresh task it is running', () => {
@@ -105,6 +71,27 @@ describe('dataLoaderFlow', () => {
       gen.next(startRefreshAction);
       gen.next(mockLoaderTask);
       expect(gen.next(stopRefreshAction).value).to.eql(cancel(mockLoaderTask));
+    });
+  });
+
+  describe('on MANUAL_REFRESH action', () => {
+    it('should take MANUAL_REFRESH action', () => {
+      expect(gen.next(startRefreshAction).value)
+        .to.eql(take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]));
+    });
+
+    it('should call fetchData if autoRefresh is not running', () => {
+      gen.next();
+
+      expect(gen.next(manualRefreshAction).value).to.eql(call(fetchData, manualRefreshAction));
+    });
+
+    it('should not call fetchData if autoRefresh is running', () => {
+      gen.next();
+      gen.next(startRefreshAction);
+      gen.next(startRefreshAction);
+
+      expect(gen.next(manualRefreshAction).value).to.not.eql(call(fetchData, manualRefreshAction));
     });
   });
 });

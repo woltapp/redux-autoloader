@@ -3,7 +3,6 @@ import { delay } from 'redux-saga';
 import { race, call, put, take, cancel, fork } from 'redux-saga/effects';
 
 import {
-  INITIALIZE,
   START_REFRESH,
   STOP_REFRESH,
   MANUAL_REFRESH,
@@ -45,20 +44,11 @@ export function* autoRefresh(action) {
   }
 }
 
-export function* watchManualRefresh(action) {
-  while (true) {
-    const manualRefreshAction = yield take(act =>
-      act.type === MANUAL_REFRESH && act.meta.loader === action.meta.loader);
-
-    yield call(fetchData, manualRefreshAction);
-  }
-}
-
 export function* dataLoaderFlow() {
   const tasks = {};
 
   while (true) {
-    const action = yield take([START_REFRESH, STOP_REFRESH, INITIALIZE]);
+    const action = yield take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]);
 
     const loaderTasks = tasks[action.meta.loader] || {};
 
@@ -67,20 +57,16 @@ export function* dataLoaderFlow() {
     }
 
     if (action.type === START_REFRESH && !loaderTasks.autoRefresh) {
-      if (loaderTasks.watchManualRefresh) {
-        yield cancel(loaderTasks.watchManualRefresh);
-        delete loaderTasks.watchManualRefresh;
-      }
-
       tasks[action.meta.loader].autoRefresh = yield fork(autoRefresh, action);
-    } else if (!loaderTasks.watchManualRefresh) {
-      if (loaderTasks.autoRefresh) {
-        yield cancel(loaderTasks.autoRefresh);
-        delete loaderTasks.autoRefresh;
-      }
+    }
 
-      tasks[action.meta.loader].watchManualRefresh =
-        yield fork(watchManualRefresh, action);
+    if (action.type === STOP_REFRESH && loaderTasks.autoRefresh) {
+      yield cancel(loaderTasks.autoRefresh);
+      delete loaderTasks.autoRefresh;
+    }
+
+    if (action.type === MANUAL_REFRESH && !loaderTasks.autoRefresh) {
+      yield call(fetchData, action);
     }
   }
 }
