@@ -43,6 +43,7 @@ export default function reduxAutoloader({
   cacheExpiresIn = 0,
   autoRefreshInterval = 0,
   reinitialize = () => false,
+  pureConnect = true,
   /* eslint-enable react/prop-types */
 }, mapStateToProps = state => state) {
   assert(name, 'name is required');
@@ -51,6 +52,7 @@ export default function reduxAutoloader({
   assert(typeof startOnMount === 'boolean', 'startOnMount must be a boolean');
   assert(typeof reloadOnMount === 'boolean', 'reloadOnMount must be a boolean');
   assert(typeof resetOnUnmount === 'boolean', 'resetOnUnmount must be a boolean');
+  assert(typeof pureConnect === 'boolean', 'pureConnect must be a boolean');
 
   if (apiCall) {
     assert(apiCall, 'apiCall must be a function');
@@ -82,7 +84,7 @@ export default function reduxAutoloader({
     startRefresh,
     stopRefresh,
     reset,
-  });
+  }, null, { pure: pureConnect });
 
   return (WrappedComponent) => {
     class DataComponent extends PureComponent {

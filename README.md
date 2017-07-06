@@ -169,6 +169,9 @@ and `nextProps` as second. When the function returns `true`
     - __! NOTE !__ setting `reinitialize: () => true` or any other function that returns
     always true will cause an infinite loop (do not do this!)
 
+* __`pureConnect`__ _(Bool)_: This library uses `connect()` from `react-redux` under hood. Set `pureConnect: false` if you wish to prevent `connect()` from controlling component updates based on props.
+    - default: `true`
+
 ### mapStateToProps
 
 `mapStateToProps` is an optional function to provide if you want to
