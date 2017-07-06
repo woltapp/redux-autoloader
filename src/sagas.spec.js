@@ -29,7 +29,7 @@ describe('fetchData', () => {
 
     expect(gen.next().value).to.eql(put(fetchDataRequest('test-loader', {
       apiCall: fakeApi,
-      props: mockProps
+      props: mockProps,
     })));
     expect(gen.next().value).to.eql(call(fakeApi, mockProps));
   });
