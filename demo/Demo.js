@@ -74,7 +74,7 @@ const createMounter = (name, Wrapped) => class MountedComponent extends Componen
   }
 };
 
-const LoaderView1 = createMounter('Loader 1', reduxAutoloader({
+const LoaderView1 = createMounter('Loader 1 (auto refresh in 2000ms)', reduxAutoloader({
   name: 'demo-loader-1',
   autoRefreshInterval: 2000,
   reloadOnMount: true,
@@ -83,7 +83,7 @@ const LoaderView1 = createMounter('Loader 1', reduxAutoloader({
   apiCall: demoApi,
 })(LoaderView));
 
-const LoaderView2 = createMounter('Loader 2', reduxAutoloader({
+const LoaderView2 = createMounter('Loader 2 (no reload on mount)', reduxAutoloader({
   name: 'demo-loader-2',
   autoRefreshInterval: 3000,
   reloadOnMount: false,
@@ -92,9 +92,16 @@ const LoaderView2 = createMounter('Loader 2', reduxAutoloader({
   apiCall: demoApi,
 })(LoaderView));
 
-const LoaderView3 = createMounter('Loader 3', reduxAutoloader({
+const LoaderView3 = createMounter('Loader 3 (no initial auto refresh)', reduxAutoloader({
   name: 'demo-loader-3',
   autoRefreshInterval: false,
+  apiCall: demoApi,
+})(LoaderView));
+
+const LoaderView4 = createMounter('Loader 4 (  prevented on mount)', reduxAutoloader({
+  name: 'demo-loader-4',
+  autoRefreshInterval: false,
+  startOnMount: false,
   apiCall: demoApi,
 })(LoaderView));
 
@@ -105,6 +112,7 @@ const MainView = () => (
       <LoaderView1 />
       <LoaderView2 style={{ marginTop: 20 }} />
       <LoaderView3 style={{ marginTop: 20 }} />
+      <LoaderView4 style={{ marginTop: 20 }} />
     </div>
   </Provider>
 );

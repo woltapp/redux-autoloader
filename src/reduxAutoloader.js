@@ -37,6 +37,7 @@ export default function reduxAutoloader({
   /* eslint-disable react/prop-types */
   name,
   apiCall,
+  startOnMount = true,
   reloadOnMount = true,
   resetOnUnmount = true,
   cacheExpiresIn = 0,
@@ -47,7 +48,9 @@ export default function reduxAutoloader({
   assert(name, 'name is required');
   assert(typeof name === 'function' || typeof name === 'string', 'name must be a function or a string');
   assert(typeof mapStateToProps === 'function', 'selector must be a function');
+  assert(typeof startOnMount === 'boolean', 'startOnMount must be a boolean');
   assert(typeof reloadOnMount === 'boolean', 'reloadOnMount must be a boolean');
+  assert(typeof resetOnUnmount === 'boolean', 'resetOnUnmount must be a boolean');
 
   if (apiCall) {
     assert(apiCall, 'apiCall must be a function');
@@ -102,6 +105,8 @@ export default function reduxAutoloader({
       }
 
       componentWillMount() {
+        this.initMountDone = false;
+
         this.init(this.props);
       }
 
@@ -165,6 +170,12 @@ export default function reduxAutoloader({
 
         if (!hasBeenInitialized) {
           props.initialize(getReducerName(props));
+        }
+
+        // prevent load for initial mount
+        if (!this.initMountDone && !startOnMount && !autoRefreshInterval) {
+          this.initMountDone = true;
+          return;
         }
 
         const shouldReload = reloadOnMount ||

@@ -17,7 +17,7 @@ import reduxAutoloader from './reduxAutoloader';
 import * as actionTypes from './actionTypes';
 import {
   fetchDataSuccess,
-  // fetchDataFailure,
+  startRefresh,
 } from './actions';
 
 const makeStore = () => {
@@ -208,6 +208,46 @@ describe('reduxAutoloader', () => {
     );
 
     expect(fakeApi.callCount).to.equal(2);
+
+    clock.restore();
+  });
+
+  it('should not call api after mount if startOnMount=false and autoRefreshInterval=false ' +
+  'but should after manual start', () => {
+    const clock = sinon.useFakeTimers(Date.now());
+
+    const fakeApi = sinon.stub().returns('somedata');
+    const store = makeStore();
+    const Decorated = reduxAutoloader({
+      name: 'test-loader',
+      startOnMount: false,
+      autoRefreshInterval: false,
+      reloadOnMount: true,
+      apiCall: fakeApi,
+      cacheExpiresIn: 1000,
+    })(TestComponent);
+
+    TestUtils.renderIntoDocument(
+      <Provider store={store}>
+        <Decorated />
+      </Provider>,
+    );
+
+    store.dispatch(fetchDataSuccess('test-loader', 'test-result-data'));
+
+    clock.tick(1100);
+
+    TestUtils.renderIntoDocument(
+      <Provider store={store}>
+        <Decorated />
+      </Provider>,
+    );
+
+    expect(fakeApi.callCount).to.equal(0);
+
+    store.dispatch(startRefresh('test-loader', fakeApi, 1000, {}));
+
+    expect(fakeApi.callCount).to.equal(1);
 
     clock.restore();
   });
