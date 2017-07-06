@@ -175,7 +175,7 @@ export default function reduxAutoloader({
         }
 
         // prevent load for initial mount
-        if (!this.initMountDone && !startOnMount && !autoRefreshInterval) {
+        if (!this.initMountDone && !startOnMount) {
           this.initMountDone = true;
           return;
         }

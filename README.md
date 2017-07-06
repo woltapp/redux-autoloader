@@ -143,7 +143,7 @@ simply as a connector to the data state.
 * __`startOnMount`__ _(Bool)_: Control the behavior of the loader on mount. Set to `false`
 if you do not want load on mount and you don't want to start autorefreshing automatically
 (if `autoRefreshInterval` is set).
-    - default: `true` (enable refresh on mount and start auto refrshing)
+    - default: `true` (enable refresh on mount and start auto refreshing)
 
 * __`autoRefreshInterval`__ _(Number)_: Provide an integer in milliseconds to define
 the interval of automatic refreshing. If set to `0` or `undefined`, automatic refresh

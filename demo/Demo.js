@@ -98,9 +98,9 @@ const LoaderView3 = createMounter('Loader 3 (no initial auto refresh)', reduxAut
   apiCall: demoApi,
 })(LoaderView));
 
-const LoaderView4 = createMounter('Loader 4 (  prevented on mount)', reduxAutoloader({
+const LoaderView4 = createMounter('Loader 4 (start prevented on mount)', reduxAutoloader({
   name: 'demo-loader-4',
-  autoRefreshInterval: false,
+  autoRefreshInterval: 1000,
   startOnMount: false,
   apiCall: demoApi,
 })(LoaderView));
