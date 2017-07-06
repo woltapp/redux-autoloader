@@ -149,11 +149,14 @@ export default function reduxAutoloader({
         });
       }
 
-      startAutoRefresh = (newTimeout) => {
+      startAutoRefresh = (newTimeout, opts = {}) => {
+        const loadImmediately = opts.loadImmediately || true;
+
         this.props.startRefresh(getReducerName(this.props), {
           apiCall,
           timeout: newTimeout || autoRefreshInterval,
           props: this.getMappedProps(this.props),
+          loadImmediately,
         });
       }
 
@@ -177,19 +180,20 @@ export default function reduxAutoloader({
           return;
         }
 
-        const shouldReload = reloadOnMount ||
+        const shouldLoadNow = reloadOnMount ||
           !hasBeenInitialized ||
           (cacheExpiresIn && cacheIsStale(dataReceivedAt, cacheExpiresIn));
 
-        if (apiCall && autoRefreshInterval) {
+        if (autoRefreshInterval) {
           props.startRefresh(getReducerName(props), {
             apiCall,
+            loadImmediately: shouldLoadNow,
             timeout: autoRefreshInterval,
             props: this.getMappedProps(props),
           });
         }
 
-        if (apiCall && shouldReload) {
+        if (!autoRefreshInterval && shouldLoadNow) {
           props.manualRefresh(getReducerName(props), {
             apiCall,
             props: this.getMappedProps(props),

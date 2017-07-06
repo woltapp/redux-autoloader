@@ -25,8 +25,11 @@ export const fetchDataFailure = (loader, { error }) => ({
   error: true,
 });
 
-export const startRefresh = (loader, { apiCall, timeout, props }) =>
-  ({ type: START_REFRESH, meta: { loader }, payload: { apiCall, timeout, props } });
+export const startRefresh = (loader, { apiCall, timeout, props, loadImmediately }) => ({
+  type: START_REFRESH,
+  meta: { loader },
+  payload: { apiCall, timeout, props, loadImmediately },
+});
 
 export const stopRefresh = loader =>
   ({ type: STOP_REFRESH, meta: { loader } });

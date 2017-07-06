@@ -194,7 +194,7 @@ Props provided to the wrapped component.
 * __`error`__ _(any)_: Rejected data received from the apiCall Promise.
 * __`errorReceivedAt`__ _(Number)_: Datetime as UNIX epoch when error was received.
 * __`refresh`__ _(Function)_: Call to refresh (reload) data immediately.
-* __`startAutoRefresh`__ _(Function)_: Call to start auto-refreshing. Takes `refreshInterval` as first optional argument.
+* __`startAutoRefresh`__ _(Function)_: Call to start auto-refreshing. Takes `refreshInterval` as first optional argument. Takes `options` object as second argument. Set `options={ loadImmediately: false }` to start refreshing but skip first load.
 * __`stopAutoRefresh`__ _(Function)_: Call to stop auto-refreshing.
 
 

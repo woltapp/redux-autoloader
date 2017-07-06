@@ -30,12 +30,18 @@ export function* fetchData(action) {
 
 export function* autoRefresh(action) {
   while (true) {
-    yield call(fetchData, action);
+    if (action.payload.loadImmediately) {
+      yield call(fetchData, action);
+    }
 
     yield race([
       call(delay, action.payload.timeout),
       take(act => act.type === MANUAL_REFRESH && act.meta.loader === action.meta.loader),
     ]);
+
+    if (!action.payload.loadImmediately) {
+      yield call(fetchData, action);
+    }
   }
 }
 
