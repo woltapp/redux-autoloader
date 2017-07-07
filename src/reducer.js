@@ -8,16 +8,24 @@ import {
   RESET,
 } from './actionTypes';
 
+const initialState = {
+  initialized: false,
+  refreshing: false,
+  loading: false,
+  data: undefined,
+  error: undefined,
+};
+
 function reducer(state = {}, action) {
   switch (action.type) {
     case INITIALIZE:
       return {
-        ...state,
-        refreshing: false,
-        loading: false,
-        data: undefined,
-        error: undefined,
+        ...initialState,
+        initialized: true,
       };
+
+    case RESET:
+      return initialState;
 
     case FETCH_DATA_REQUEST:
       return {
@@ -63,12 +71,6 @@ function reducer(state = {}, action) {
 export default function (state = {}, action) {
   if (!action.meta || !action.meta.loader) {
     return state;
-  }
-
-  if (action.type === RESET) {
-    const newState = { ...state };
-    delete newState[action.meta.loader];
-    return newState;
   }
 
   return {
