@@ -63,6 +63,7 @@
     "karma-webpack": "2.0.3",
     "mocha": "3.4.2",
     "phantomjs-prebuilt": "2.1.14",
+    "prop-types": "^15.5.10",
     "react": "15.5.4",
     "react-addons-test-utils": "15.5.1",
     "react-dom": "15.5.4",
@@ -76,7 +77,6 @@
   },
   "dependencies": {
     "babel-runtime": "^6.10.0",
-    "prop-types": "^15.5.10",
     "react-display-name": "^0.2.0"
   }
 }
