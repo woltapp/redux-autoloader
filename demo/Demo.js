@@ -1,5 +1,6 @@
-/* eslint-disable react/prop-types, no-console */
+/* eslint-disable react/prop-types, no-console, react/forbid-prop-types */
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
 
 import makeStore from './makeStore';
@@ -45,6 +46,16 @@ const LoaderView = ({
     </div>
   </div>
 );
+
+LoaderView.propTypes = {
+  data: PropTypes.object,
+  isLoading: PropTypes.bool.isRequired,
+  isRefreshing: PropTypes.bool.isRequired,
+  style: PropTypes.object,
+  refresh: PropTypes.func.isRequired,
+  stopAutoRefresh: PropTypes.func.isRequired,
+  startAutoRefresh: PropTypes.func.isRequired,
+};
 
 const createMounter = (name, Wrapped) => class MountedComponent extends Component {
   state = { mounted: true }
