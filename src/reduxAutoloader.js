@@ -113,10 +113,15 @@ export default function reduxAutoloader({
       }
 
       componentWillReceiveProps(nextProps) {
-        if (reinitialize(this.props, nextProps) || !nextProps.hasBeenInitialized) {
-          this.props.stopRefresh(getReducerName(nextProps));
-          this.props.reset(getReducerName(nextProps));
+        if (!nextProps.hasBeenInitialized) {
           this.init(nextProps);
+        } else if (reinitialize(this.props, nextProps)) {
+          const props = nextProps;
+
+          props.manualRefresh(getReducerName(props), {
+            apiCall,
+            props: this.getMappedProps(props),
+          });
         }
       }
 

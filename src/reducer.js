@@ -59,7 +59,6 @@ function reducer(state = {}, action) {
     case STOP_REFRESH:
       return {
         ...state,
-        loading: false,
         refreshing: false,
       };
 
