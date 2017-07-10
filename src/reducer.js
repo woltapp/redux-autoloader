@@ -40,6 +40,7 @@ function reducer(state = {}, action) {
         data: action.payload.data,
         dataReceivedAt: action.payload.dataReceivedAt,
         error: undefined,
+        errorReceivedAt: undefined,
       };
 
     case FETCH_DATA_FAILURE:
@@ -47,7 +48,7 @@ function reducer(state = {}, action) {
         ...state,
         loading: false,
         errorReceivedAt: action.payload.errorReceivedAt,
-        error: action.error,
+        error: action.payload.error,
       };
 
     case START_REFRESH:
