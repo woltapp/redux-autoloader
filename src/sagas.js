@@ -6,6 +6,7 @@ import {
   START_REFRESH,
   STOP_REFRESH,
   LOAD,
+  RESET,
 } from './actionTypes';
 import {
   fetchDataRequest,
@@ -48,7 +49,7 @@ export function* dataLoaderFlow() {
   const tasks = {};
 
   while (true) {
-    const action = yield take([START_REFRESH, STOP_REFRESH, LOAD]);
+    const action = yield take([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
 
     const loaderTasks = tasks[action.meta.loader] || {};
 
@@ -60,7 +61,7 @@ export function* dataLoaderFlow() {
       tasks[action.meta.loader].autoRefresh = yield fork(autoRefresh, action);
     }
 
-    if (action.type === STOP_REFRESH && loaderTasks.autoRefresh) {
+    if ((action.type === RESET || action.type === STOP_REFRESH) && loaderTasks.autoRefresh) {
       yield cancel(loaderTasks.autoRefresh);
       delete loaderTasks.autoRefresh;
     }

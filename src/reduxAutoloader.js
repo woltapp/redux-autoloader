@@ -116,12 +116,7 @@ export default function reduxAutoloader({
         if (!nextProps.hasBeenInitialized) {
           this.init(nextProps);
         } else if (reinitialize(this.props, nextProps)) {
-          const props = nextProps;
-
-          props.load(getReducerName(props), {
-            apiCall,
-            props: this.getMappedProps(props),
-          });
+          nextProps.reset(getReducerName(nextProps));
         }
       }
 

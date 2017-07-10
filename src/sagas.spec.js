@@ -11,6 +11,7 @@ import {
   START_REFRESH,
   STOP_REFRESH,
   LOAD,
+  RESET,
 } from './actionTypes';
 import {
   fetchData,
@@ -49,7 +50,7 @@ describe('dataLoaderFlow', () => {
   describe('on START_REFRESH action', () => {
     it('should take START_REFRESH action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD]));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
     });
 
     it('should fork autoRefresh', () => {
@@ -61,7 +62,7 @@ describe('dataLoaderFlow', () => {
   describe('on STOP_REFRESH action', () => {
     it('should take STOP_REFRESH action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD]));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
     });
 
     it('should cancel autoRefresh task it is running', () => {
@@ -77,7 +78,7 @@ describe('dataLoaderFlow', () => {
   describe('on LOAD action', () => {
     it('should take LOAD action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD]));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
     });
 
     it('should call fetchData if autoRefresh is not running', () => {
