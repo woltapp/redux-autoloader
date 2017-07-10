@@ -10,7 +10,7 @@ import getDisplayName from 'react-display-name';
 import { assert } from './utils';
 import {
   initialize,
-  manualRefresh,
+  load,
   startRefresh,
   stopRefresh,
   reset,
@@ -80,7 +80,7 @@ export default function reduxAutoloader({
     });
   }, {
     initialize,
-    manualRefresh,
+    load,
     startRefresh,
     stopRefresh,
     reset,
@@ -91,7 +91,7 @@ export default function reduxAutoloader({
       static propTypes = {
         hasBeenInitialized: PropTypes.bool.isRequired,
         initialize: PropTypes.func.isRequired,
-        manualRefresh: PropTypes.func.isRequired,
+        load: PropTypes.func.isRequired,
         startRefresh: PropTypes.func.isRequired,
         stopRefresh: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
@@ -118,7 +118,7 @@ export default function reduxAutoloader({
         } else if (reinitialize(this.props, nextProps)) {
           const props = nextProps;
 
-          props.manualRefresh(getReducerName(props), {
+          props.load(getReducerName(props), {
             apiCall,
             props: this.getMappedProps(props),
           });
@@ -150,7 +150,7 @@ export default function reduxAutoloader({
       }
 
       refresh = () => {
-        this.props.manualRefresh(getReducerName(this.props), {
+        this.props.load(getReducerName(this.props), {
           apiCall,
           props: this.getMappedProps(this.props),
         });
@@ -201,7 +201,7 @@ export default function reduxAutoloader({
         }
 
         if (!autoRefreshInterval && shouldLoadNow) {
-          props.manualRefresh(getReducerName(props), {
+          props.load(getReducerName(props), {
             apiCall,
             props: this.getMappedProps(props),
           });

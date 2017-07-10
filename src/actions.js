@@ -5,7 +5,7 @@ import {
   FETCH_DATA_FAILURE,
   START_REFRESH,
   STOP_REFRESH,
-  MANUAL_REFRESH,
+  LOAD,
   RESET,
 } from './actionTypes';
 
@@ -34,8 +34,8 @@ export const startRefresh = (loader, { apiCall, timeout, props, loadImmediately 
 export const stopRefresh = loader =>
   ({ type: STOP_REFRESH, meta: { loader } });
 
-export const manualRefresh = (loader, { apiCall, props }) =>
-  ({ type: MANUAL_REFRESH, meta: { loader }, payload: { apiCall, props } });
+export const load = (loader, { apiCall, props }) =>
+  ({ type: LOAD, meta: { loader }, payload: { apiCall, props } });
 
 export const reset = loader =>
   ({ type: RESET, meta: { loader } });

@@ -5,7 +5,7 @@ import { race, call, put, take, cancel, fork } from 'redux-saga/effects';
 import {
   START_REFRESH,
   STOP_REFRESH,
-  MANUAL_REFRESH,
+  LOAD,
 } from './actionTypes';
 import {
   fetchDataRequest,
@@ -35,7 +35,7 @@ export function* autoRefresh(action) {
 
     yield race([
       call(delay, action.payload.timeout),
-      take(act => act.type === MANUAL_REFRESH && act.meta.loader === action.meta.loader),
+      take(act => act.type === LOAD && act.meta.loader === action.meta.loader),
     ]);
 
     if (!action.payload.loadImmediately) {
@@ -48,7 +48,7 @@ export function* dataLoaderFlow() {
   const tasks = {};
 
   while (true) {
-    const action = yield take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]);
+    const action = yield take([START_REFRESH, STOP_REFRESH, LOAD]);
 
     const loaderTasks = tasks[action.meta.loader] || {};
 
@@ -65,7 +65,7 @@ export function* dataLoaderFlow() {
       delete loaderTasks.autoRefresh;
     }
 
-    if (action.type === MANUAL_REFRESH && !loaderTasks.autoRefresh) {
+    if (action.type === LOAD && !loaderTasks.autoRefresh) {
       yield call(fetchData, action);
     }
   }

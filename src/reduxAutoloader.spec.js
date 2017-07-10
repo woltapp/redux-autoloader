@@ -325,7 +325,7 @@ describe('reduxAutoloader', () => {
       props.refresh();
 
       const dispatchedAction = store.dispatch.firstCall.returnValue;
-      expect(dispatchedAction.type).to.equal(actionTypes.MANUAL_REFRESH);
+      expect(dispatchedAction.type).to.equal(actionTypes.LOAD);
       expect(dispatchedAction.payload.apiCall).to.equal(fakeApi);
       expect(store.dispatch.callCount).to.equal(1);
       expect(fakeApi.callCount).to.equal(1);

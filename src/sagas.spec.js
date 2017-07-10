@@ -2,7 +2,7 @@ import { cancel, call, put, fork, take } from 'redux-saga/effects';
 import { createMockTask } from 'redux-saga/utils';
 
 import {
-  manualRefresh,
+  load,
   fetchDataRequest,
   startRefresh,
   stopRefresh,
@@ -10,7 +10,7 @@ import {
 import {
   START_REFRESH,
   STOP_REFRESH,
-  MANUAL_REFRESH,
+  LOAD,
 } from './actionTypes';
 import {
   fetchData,
@@ -23,7 +23,7 @@ describe('fetchData', () => {
   const mockProps = { testProp: 'test' };
 
   it('should call api', () => {
-    const gen = fetchData(manualRefresh('test-loader', { apiCall: fakeApi, props: mockProps }));
+    const gen = fetchData(load('test-loader', { apiCall: fakeApi, props: mockProps }));
 
     expect(gen.next().value).to.eql(put(fetchDataRequest('test-loader', {
       apiCall: fakeApi,
@@ -38,7 +38,7 @@ describe('dataLoaderFlow', () => {
   const mockProps = { testProp: 'test' };
   const startRefreshAction = startRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
   const stopRefreshAction = stopRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
-  const manualRefreshAction = manualRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
+  const loadAction = load('test-loader', { apiCall: fakeApi, props: mockProps });
 
   let gen;
 
@@ -49,7 +49,7 @@ describe('dataLoaderFlow', () => {
   describe('on START_REFRESH action', () => {
     it('should take START_REFRESH action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD]));
     });
 
     it('should fork autoRefresh', () => {
@@ -61,7 +61,7 @@ describe('dataLoaderFlow', () => {
   describe('on STOP_REFRESH action', () => {
     it('should take STOP_REFRESH action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD]));
     });
 
     it('should cancel autoRefresh task it is running', () => {
@@ -74,16 +74,16 @@ describe('dataLoaderFlow', () => {
     });
   });
 
-  describe('on MANUAL_REFRESH action', () => {
-    it('should take MANUAL_REFRESH action', () => {
+  describe('on LOAD action', () => {
+    it('should take LOAD action', () => {
       expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, MANUAL_REFRESH]));
+        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD]));
     });
 
     it('should call fetchData if autoRefresh is not running', () => {
       gen.next();
 
-      expect(gen.next(manualRefreshAction).value).to.eql(call(fetchData, manualRefreshAction));
+      expect(gen.next(loadAction).value).to.eql(call(fetchData, loadAction));
     });
 
     it('should not call fetchData if autoRefresh is running', () => {
@@ -91,7 +91,7 @@ describe('dataLoaderFlow', () => {
       gen.next(startRefreshAction);
       gen.next(startRefreshAction);
 
-      expect(gen.next(manualRefreshAction).value).to.not.eql(call(fetchData, manualRefreshAction));
+      expect(gen.next(loadAction).value).to.not.eql(call(fetchData, loadAction));
     });
   });
 });
