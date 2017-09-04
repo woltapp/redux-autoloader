@@ -47,7 +47,7 @@
 ## Try demo locally
 
 ```
-git clone git clone https://github.com/woltapp/redux-autoloader.git
+git clone https://github.com/woltapp/redux-autoloader.git
 cd redux-autoloader
 npm install
 npm start
