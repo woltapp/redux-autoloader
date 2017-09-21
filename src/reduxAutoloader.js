@@ -113,6 +113,10 @@ export default function reduxAutoloader({
       }
 
       componentWillReceiveProps(nextProps) {
+        if (getReducerName(this.props) !== getReducerName(nextProps)) {
+          this.stopAutoRefresh(this.props);
+        }
+
         if (!nextProps.hasBeenInitialized) {
           this.init(nextProps);
         } else if (reinitialize(this.props, nextProps)) {
