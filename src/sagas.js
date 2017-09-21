@@ -45,12 +45,10 @@ export function* autoRefresh(action) {
   }
 }
 
-export function* dataLoaderFlow() {
-  const tasks = {};
+export const createDataLoaderFlow = (taskConf = {}) => {
+  const tasks = { ...taskConf };
 
-  while (true) {
-    const action = yield take([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
-
+  return function* dataLoaderFlow(action) {
     const loaderTasks = tasks[action.meta.loader] || {};
 
     if (!tasks[action.meta.loader]) {
@@ -69,9 +67,14 @@ export function* dataLoaderFlow() {
     if (action.type === LOAD && !loaderTasks.autoRefresh) {
       yield call(fetchData, action);
     }
-  }
-}
+  };
+};
 
 export default function* rootSaga() {
-  yield fork(dataLoaderFlow);
+  const dataLoaderFlow = createDataLoaderFlow();
+
+  while (true) {
+    const action = yield take([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
+    yield fork(dataLoaderFlow, action);
+  }
 }

@@ -13,9 +13,9 @@ import {
   LOAD,
   RESET,
 } from './actionTypes';
-import {
+import rootSaga, {
+  createDataLoaderFlow,
   fetchData,
-  dataLoaderFlow,
   autoRefresh,
 } from './sagas';
 
@@ -34,6 +34,28 @@ describe('fetchData', () => {
   });
 });
 
+describe('rootSaga', () => {
+  const fakeApi = sinon.stub().returns(Promise.resolve('testresult'));
+  const mockProps = { testProp: 'test' };
+  const startRefreshAction = startRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
+  let gen;
+
+  before(() => {
+    gen = rootSaga();
+  });
+
+  it('should take START_REFRESH, STOP_REFRESH, LOAD and RESET action', () => {
+    expect(gen.next().value)
+      .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
+  });
+
+  it('should fork dataLoaderFlow with the action as argument and empty tasks', () => {
+    const val = gen.next(startRefreshAction).value;
+    expect(val.FORK.fn.name).to.eql('dataLoaderFlow');
+    expect(val.FORK.args[0]).to.eql(startRefreshAction);
+  });
+});
+
 describe('dataLoaderFlow', () => {
   const fakeApi = sinon.stub().returns(Promise.resolve('testresult'));
   const mockProps = { testProp: 'test' };
@@ -42,57 +64,53 @@ describe('dataLoaderFlow', () => {
   const loadAction = load('test-loader', { apiCall: fakeApi, props: mockProps });
 
   let gen;
+  let dataLoaderFlow;
 
   beforeEach(() => {
-    gen = dataLoaderFlow();
+    dataLoaderFlow = createDataLoaderFlow();
   });
 
   describe('on START_REFRESH action', () => {
-    it('should take START_REFRESH action', () => {
-      expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
+    beforeEach(() => {
+      gen = dataLoaderFlow(startRefreshAction);
     });
 
     it('should fork autoRefresh', () => {
-      gen.next(startRefreshAction);
-      expect(gen.next(startRefreshAction).value).to.eql(fork(autoRefresh, startRefreshAction));
+      expect(gen.next().value).to.eql(fork(autoRefresh, startRefreshAction));
     });
   });
 
   describe('on STOP_REFRESH action', () => {
-    it('should take STOP_REFRESH action', () => {
-      expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
+    beforeEach(() => {
+      gen = dataLoaderFlow(stopRefreshAction);
     });
 
-    it('should cancel autoRefresh task it is running', () => {
+    it('should cancel autoRefresh task if it is running', () => {
       const mockLoaderTask = createMockTask();
       mockLoaderTask.name = 'autoRefresh';
-      gen.next(startRefreshAction);
-      gen.next(startRefreshAction);
-      gen.next(mockLoaderTask);
+      mockLoaderTask.meta = { loader: 'test-loader' };
+      const startGen = dataLoaderFlow(startRefreshAction);
+      startGen.next();
+      startGen.next(mockLoaderTask);
       expect(gen.next(stopRefreshAction).value).to.eql(cancel(mockLoaderTask));
     });
   });
 
   describe('on LOAD action', () => {
-    it('should take LOAD action', () => {
-      expect(gen.next(startRefreshAction).value)
-        .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
+    beforeEach(() => {
+      gen = dataLoaderFlow(loadAction);
     });
 
     it('should call fetchData if autoRefresh is not running', () => {
-      gen.next();
-
-      expect(gen.next(loadAction).value).to.eql(call(fetchData, loadAction));
+      expect(gen.next().value).to.eql(call(fetchData, loadAction));
     });
 
     it('should not call fetchData if autoRefresh is running', () => {
-      gen.next();
-      gen.next(startRefreshAction);
-      gen.next(startRefreshAction);
+      const startGen = dataLoaderFlow(startRefreshAction);
+      startGen.next(startRefreshAction);
+      startGen.next(startRefreshAction);
 
-      expect(gen.next(loadAction).value).to.not.eql(call(fetchData, loadAction));
+      expect(gen.next().value).to.not.eql(call(fetchData, loadAction));
     });
   });
 });
