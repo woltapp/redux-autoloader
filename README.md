@@ -119,6 +119,19 @@ const ConnectedComponent = reduxAutoloader({
 })(ExampleComponent);
 ```
 
+
+#### Reload (refresh) when prop changes
+
+```jsx
+const ConnectedComponent = reduxAutoloader({
+  name: 'example-loader-3',
+  apiCall: yourDataFech,
+  reload: (props, nextProps) => props.myProp !== nextProps.myProp, // Watch when `myProp`
+                                                                   // changes and reload
+})(ExampleComponent);
+```
+
+
 ## API Documentation
 
 `reduxAutoloader(options, mapStateToProps)` takes `options` (Object) as
@@ -161,9 +174,19 @@ e.g. prevent excessive page loads.
 * __`resetOnUnmount`__ _(Bool)_: Control whether to completely reset data-loader state on unmount.
     - default: `true`
 
+* __`reload`__ _(Function -> Bool)_: This function is run when the decorated component
+receives new props. The function takes `props` (current props) as first argument
+and `nextProps` as second. When the function returns `true`, it performs a refresh on the
+data loader. Compared to `reinitialize` (below), this won't reset the loader state.
+    - example: `reload: (props, nextProps) => props.userId !== nextProps.userId`
+    - default: `() => false`
+    - __! NOTE !__ setting `reload: () => true` or any other function that returns
+    always true will cause an infinite loop (do not do this!)
+
 * __`reinitialize`__ _(Function -> Bool)_: This function is run when the decorated component
 receives new props. The function takes `props` (current props) as first argument
-and `nextProps` as second. When the function returns `true`
+and `nextProps` as second. When the function returns `true`, it resets the data loader; effectively
+re-mounting the component with a clean loader state.
     - example: `reinitialize: (props, nextProps) => props.userId !== nextProps.userId`
     - default: `() => false`
     - __! NOTE !__ setting `reinitialize: () => true` or any other function that returns

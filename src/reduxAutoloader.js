@@ -43,6 +43,7 @@ export default function reduxAutoloader({
   cacheExpiresIn = 0,
   autoRefreshInterval = 0,
   reinitialize = () => false,
+  reload = () => false,
   pureConnect = true,
   /* eslint-enable react/prop-types */
 }, mapStateToProps = state => state) {
@@ -121,6 +122,8 @@ export default function reduxAutoloader({
           this.init(nextProps);
         } else if (reinitialize(this.props, nextProps)) {
           nextProps.reset(getReducerName(nextProps));
+        } else if (reload(this.props, nextProps)) {
+          this.refresh();
         }
       }
 
