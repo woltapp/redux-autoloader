@@ -8,13 +8,7 @@ import { connect } from 'react-redux';
 import getDisplayName from 'react-display-name';
 
 import { assert } from './utils';
-import {
-  initialize,
-  load,
-  startRefresh,
-  stopRefresh,
-  reset,
-} from './actions';
+import * as actions from './actions';
 import {
   isInitialized,
   isLoading,
@@ -82,11 +76,11 @@ export default function reduxAutoloader({
       errorReceivedAt: getErrorReceivedAt(state, reducerName),
     });
   }, {
-    initialize,
-    load,
-    startRefresh,
-    stopRefresh,
-    reset,
+    initialize: actions.initialize,
+    load: actions.load,
+    startRefresh: actions.startRefresh,
+    stopRefresh: actions.stopRefresh,
+    reset: actions.reset,
   }, null, { pure: pureConnect });
 
   return (WrappedComponent) => {
