@@ -54,6 +54,8 @@ export default function reduxAutoloader({
   assert(typeof reloadOnMount === 'boolean', 'reloadOnMount must be a boolean');
   assert(typeof resetOnUnmount === 'boolean', 'resetOnUnmount must be a boolean');
   assert(typeof pureConnect === 'boolean', 'pureConnect must be a boolean');
+  assert(typeof reload === 'function', 'reload must be a boolean');
+  assert(typeof reinitialize === 'function', 'reinitialize must be a boolean');
 
   if (apiCall) {
     assert(apiCall, 'apiCall must be a function');
