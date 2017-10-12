@@ -1,6 +1,6 @@
 /* eslint-disable no-constant-condition, no-loop-func */
 import { delay } from 'redux-saga';
-import { race, call, put, take, cancel, fork } from 'redux-saga/effects';
+import { takeEvery, race, call, put, take, cancel, fork } from 'redux-saga/effects';
 
 import {
   START_REFRESH,
@@ -73,8 +73,5 @@ export const createDataLoaderFlow = (taskConf = {}) => {
 export default function* rootSaga() {
   const dataLoaderFlow = createDataLoaderFlow();
 
-  while (true) {
-    const action = yield take([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
-    yield fork(dataLoaderFlow, action);
-  }
+  yield takeEvery([START_REFRESH, STOP_REFRESH, LOAD, RESET], dataLoaderFlow);
 }
