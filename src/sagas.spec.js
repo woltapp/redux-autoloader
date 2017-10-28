@@ -1,4 +1,4 @@
-import { cancel, call, put, fork, take } from 'redux-saga/effects';
+import { cancel, call, put, fork, takeEvery } from 'redux-saga/effects';
 import { createMockTask } from 'redux-saga/utils';
 
 import {
@@ -35,24 +35,17 @@ describe('fetchData', () => {
 });
 
 describe('rootSaga', () => {
-  const fakeApi = sinon.stub().returns(Promise.resolve('testresult'));
-  const mockProps = { testProp: 'test' };
-  const startRefreshAction = startRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
   let gen;
 
   before(() => {
     gen = rootSaga();
   });
 
-  it('should take START_REFRESH, STOP_REFRESH, LOAD and RESET action', () => {
-    expect(gen.next().value)
-      .to.eql(take([START_REFRESH, STOP_REFRESH, LOAD, RESET]));
-  });
+  it('should take every START_REFRESH, STOP_REFRESH, LOAD and RESET action', () => {
+    const val = gen.next().value;
 
-  it('should fork dataLoaderFlow with the action as argument and empty tasks', () => {
-    const val = gen.next(startRefreshAction).value;
-    expect(val.FORK.fn.name).to.eql('dataLoaderFlow');
-    expect(val.FORK.args[0]).to.eql(startRefreshAction);
+    expect(val).to.include.key('FORK');
+    expect(val.FORK.args[0]).to.eql([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
   });
 });
 
