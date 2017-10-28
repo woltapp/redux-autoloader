@@ -119,7 +119,10 @@ export default function reduxAutoloader({
         } else if (reinitialize(this.props, nextProps)) {
           nextProps.reset(getReducerName(nextProps));
         } else if (reload(this.props, nextProps)) {
-          this.refresh(nextProps);
+          nextProps.load(getReducerName(nextProps), {
+            apiCall,
+            props: this.getMappedProps(nextProps),
+          });
         }
       }
 
@@ -147,12 +150,10 @@ export default function reduxAutoloader({
         return { ...props.passedProps, ...mapStateToProps(exposedProps, props.passedProps) };
       }
 
-      refresh = (nextProps) => {
-        const props = nextProps || this.props;
-
-        props.load(getReducerName(props), {
+      refresh = () => {
+        this.props.load(getReducerName(this.props), {
           apiCall,
-          props: this.getMappedProps(props),
+          props: this.getMappedProps(this.props),
         });
       }
 
