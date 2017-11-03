@@ -104,30 +104,63 @@ export default function reduxAutoloader({
       }
 
       componentWillMount() {
-        this.initMountDone = false;
+        if (!this.props.hasBeenInitialized) {
+          this.props.initialize(getReducerName(this.props));
+        }
 
-        this.init(this.props);
+        if (reloadOnMount) {
+          this.refresh();
+        } else if (cacheExpiresIn &&
+          this.props.dataReceivedAt &&
+          cacheIsStale(this.props.dataReceivedAt, cacheExpiresIn)) {
+          this.refresh();
+        }
+
+        if (startOnMount && autoRefreshInterval) {
+          this.props.startRefresh(getReducerName(this.props), {
+            apiCall,
+            // loadImmediately: shouldLoadNow,
+            timeout: autoRefreshInterval,
+            props: this.getMappedProps(this.props),
+          });
+        }
       }
 
       componentWillReceiveProps(nextProps) {
-        if (getReducerName(this.props) !== getReducerName(nextProps)) {
-          this.stopAutoRefresh(this.props);
+        if (!this.props.hasBeenInitialized) {
+          return;
         }
 
-        if (!nextProps.hasBeenInitialized) {
-          this.init(nextProps);
-        } else if (reinitialize(this.props, nextProps)) {
-          nextProps.reset(getReducerName(nextProps));
+        if (!this.props.hasBeenInitialized && nextProps.hasBeenInitialized) {
+          nextProps.load(getReducerName(nextProps), {
+            apiCall,
+            props: this.getMappedProps(nextProps),
+          });
         } else if (reload(this.props, nextProps)) {
           nextProps.load(getReducerName(nextProps), {
             apiCall,
             props: this.getMappedProps(nextProps),
           });
+        } else if (cacheExpiresIn &&
+          this.props.dataReceivedAt &&
+          cacheIsStale(nextProps.dataReceivedAt, cacheExpiresIn)) {
+          nextProps.load(getReducerName(nextProps), {
+            apiCall,
+            props: this.getMappedProps(nextProps),
+          });
+        } else if (reinitialize(this.props, nextProps)) {
+          nextProps.reset(getReducerName(nextProps));
+        }
+
+        if (getReducerName(this.props) !== getReducerName(nextProps)) {
+          this.stopAutoRefresh(this.props);
         }
       }
 
       componentWillUnmount() {
-        this.props.stopRefresh(getReducerName(this.props));
+        if (this.props.isRefreshing) {
+          this.props.stopRefresh(getReducerName(this.props));
+        }
 
         if (resetOnUnmount) {
           this.props.reset(getReducerName(this.props));
@@ -170,43 +203,6 @@ export default function reduxAutoloader({
 
       stopAutoRefresh = () => {
         this.props.stopRefresh(getReducerName(this.props));
-      }
-
-      init = (props) => {
-        const {
-          hasBeenInitialized,
-          dataReceivedAt,
-        } = props;
-
-        if (!hasBeenInitialized) {
-          props.initialize(getReducerName(props));
-        }
-
-        // prevent load for initial mount
-        if (!this.initMountDone && !startOnMount) {
-          this.initMountDone = true;
-          return;
-        }
-
-        const shouldLoadNow = reloadOnMount ||
-          !hasBeenInitialized ||
-          (cacheExpiresIn && cacheIsStale(dataReceivedAt, cacheExpiresIn));
-
-        if (autoRefreshInterval) {
-          props.startRefresh(getReducerName(props), {
-            apiCall,
-            loadImmediately: shouldLoadNow,
-            timeout: autoRefreshInterval,
-            props: this.getMappedProps(props),
-          });
-        }
-
-        if (!autoRefreshInterval && shouldLoadNow) {
-          props.load(getReducerName(props), {
-            apiCall,
-            props: this.getMappedProps(props),
-          });
-        }
       }
 
       render() {

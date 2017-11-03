@@ -9,7 +9,6 @@ import {
 } from './actionTypes';
 
 const initialState = {
-  initialized: false,
   refreshing: false,
   loading: false,
   data: undefined,
@@ -19,13 +18,10 @@ const initialState = {
 function reducer(state = {}, action) {
   switch (action.type) {
     case INITIALIZE:
-      return {
-        ...initialState,
-        initialized: true,
-      };
+      return initialState;
 
     case RESET:
-      return initialState;
+      return undefined;
 
     case FETCH_DATA_REQUEST:
       return {
