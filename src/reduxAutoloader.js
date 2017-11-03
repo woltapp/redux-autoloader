@@ -31,6 +31,7 @@ export default function reduxAutoloader({
   /* eslint-disable react/prop-types */
   name,
   apiCall,
+  loadOnInitialize = true,
   startOnMount = true,
   reloadOnMount = true,
   resetOnUnmount = true,
@@ -127,15 +128,13 @@ export default function reduxAutoloader({
       }
 
       componentWillReceiveProps(nextProps) {
-        if (!this.props.hasBeenInitialized) {
-          return;
-        }
-
-        if (!this.props.hasBeenInitialized && nextProps.hasBeenInitialized) {
+        if (!this.props.hasBeenInitialized && nextProps.hasBeenInitialized && loadOnInitialize) {
           nextProps.load(getReducerName(nextProps), {
             apiCall,
             props: this.getMappedProps(nextProps),
           });
+        } else if (!this.props.hasBeenInitialized) {
+          return;
         } else if (reload(this.props, nextProps)) {
           nextProps.load(getReducerName(nextProps), {
             apiCall,
