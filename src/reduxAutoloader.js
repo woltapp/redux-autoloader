@@ -113,6 +113,7 @@ export default function reduxAutoloader({
           this.refresh();
         } else if (cacheExpiresIn &&
           this.props.dataReceivedAt &&
+          !this.props.isLoading &&
           cacheIsStale(this.props.dataReceivedAt, cacheExpiresIn)) {
           this.refresh();
         }
@@ -120,7 +121,7 @@ export default function reduxAutoloader({
         if (startOnMount && autoRefreshInterval) {
           this.props.startRefresh(getReducerName(this.props), {
             apiCall,
-            // loadImmediately: shouldLoadNow,
+            loadImmediately: loadOnInitialize,
             timeout: autoRefreshInterval,
             props: this.getMappedProps(this.props),
           });
@@ -133,6 +134,8 @@ export default function reduxAutoloader({
             apiCall,
             props: this.getMappedProps(nextProps),
           });
+        } else if (this.props.hasBeenInitialized && !nextProps.hasBeenInitialized) {
+          nextProps.initialize(getReducerName(nextProps));
         } else if (!this.props.hasBeenInitialized) {
           return;
         } else if (reload(this.props, nextProps)) {
@@ -142,6 +145,7 @@ export default function reduxAutoloader({
           });
         } else if (cacheExpiresIn &&
           this.props.dataReceivedAt &&
+          !this.props.isLoading &&
           cacheIsStale(nextProps.dataReceivedAt, cacheExpiresIn)) {
           nextProps.load(getReducerName(nextProps), {
             apiCall,

@@ -31,6 +31,8 @@ const makeStore = () => {
   return store;
 };
 
+const mockApi = sinon.stub().returns('mock-data');
+
 const render = (Wrapped, store = makeStore()) => TestUtils.renderIntoDocument(
   <Provider store={store}>
     <Wrapped />
@@ -61,6 +63,10 @@ class TestComponent extends Component {
 }
 
 describe('reduxAutoloader', () => {
+  beforeEach(() => {
+    mockApi.reset();
+  });
+
   it('should be a decorator function', () => {
     expect(reduxAutoloader).to.be.a('function');
   });
@@ -185,11 +191,10 @@ describe('reduxAutoloader', () => {
   it('should call api on re-render if reloadOnMount is false and cache is stale', () => {
     const clock = sinon.useFakeTimers(Date.now());
 
-    const fakeApi = sinon.stub().returns('somedata');
     const store = makeStore();
     const Decorated = reduxAutoloader({
       name: 'test-loader',
-      apiCall: fakeApi,
+      apiCall: mockApi,
       reloadOnMount: false,
       cacheExpiresIn: 1000,
     })(TestComponent);
@@ -199,31 +204,28 @@ describe('reduxAutoloader', () => {
         <Decorated />
       </Provider>,
     );
-    store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
+
     clock.tick(1100);
+
     TestUtils.renderIntoDocument(
       <Provider store={store}>
         <Decorated />
       </Provider>,
     );
 
-    expect(fakeApi.callCount).to.equal(2);
+    expect(mockApi.callCount).to.equal(2);
 
     clock.restore();
   });
 
-  it('should not call api after mount if startOnMount=false and autoRefreshInterval=false ' +
-  'but should after manual start', () => {
+  it('should not call api on re-render if reloadOnMount is false and cache is not stale', () => {
     const clock = sinon.useFakeTimers(Date.now());
 
-    const fakeApi = sinon.stub().returns('somedata');
     const store = makeStore();
     const Decorated = reduxAutoloader({
       name: 'test-loader',
-      startOnMount: false,
-      autoRefreshInterval: false,
-      reloadOnMount: true,
-      apiCall: fakeApi,
+      apiCall: mockApi,
+      reloadOnMount: false,
       cacheExpiresIn: 1000,
     })(TestComponent);
 
@@ -233,9 +235,7 @@ describe('reduxAutoloader', () => {
       </Provider>,
     );
 
-    store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
-
-    clock.tick(1100);
+    clock.tick(900);
 
     TestUtils.renderIntoDocument(
       <Provider store={store}>
@@ -243,18 +243,114 @@ describe('reduxAutoloader', () => {
       </Provider>,
     );
 
-    expect(fakeApi.callCount).to.equal(0);
-
-    store.dispatch(startRefresh('test-loader', {
-      apiCall: fakeApi,
-      timeout: 1000,
-      loadImmediately: true,
-      props: {},
-    }));
-
-    expect(fakeApi.callCount).to.equal(1);
+    expect(mockApi.callCount).to.equal(1);
 
     clock.restore();
+  });
+
+  describe('On initial mount', () => {
+    it('should load when only apiCall is set', () => {
+      const store = makeStore();
+      const Decorated = reduxAutoloader({
+        name: 'test-loader',
+        apiCall: mockApi,
+      })(TestComponent);
+
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
+
+      expect(mockApi.callCount).to.equal(1);
+    });
+
+    it('should load when autoRefreshInterval is set', () => {
+      const store = makeStore();
+      const Decorated = reduxAutoloader({
+        name: 'test-loader',
+        apiCall: mockApi,
+        autoRefreshInterval: 10000,
+      })(TestComponent);
+
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
+
+      expect(mockApi.callCount).to.equal(1);
+    });
+
+    it('should load when reloadOnMount=true, resetOnUnmount=true, cacheExpiresIn and autoRefreshInterval are set', () => {
+      const clock = sinon.useFakeTimers(Date.now());
+
+      const fakeApi = sinon.stub().returns('somedata');
+      const store = makeStore();
+      const Decorated = reduxAutoloader({
+        name: 'test-loader',
+        reloadOnMount: true,
+        resetOnUnmount: true,
+        cacheExpiresIn: 120000,
+        autoRefreshInterval: 120000,
+        apiCall: fakeApi,
+      })(TestComponent);
+
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
+
+      expect(fakeApi.callCount).to.equal(1);
+
+      clock.restore();
+    });
+
+    it('should not call api after mount if startOnMount=false, reloadOnMount=false, loadOnInitialize=false ' +
+    'and autoRefreshInterval=false but should after manual start', () => {
+      const clock = sinon.useFakeTimers(Date.now());
+
+      const fakeApi = sinon.stub().returns('somedata');
+      const store = makeStore();
+      const Decorated = reduxAutoloader({
+        name: 'test-loader',
+        startOnMount: false,
+        reloadOnMount: false,
+        loadOnInitialize: false,
+        autoRefreshInterval: false,
+        apiCall: fakeApi,
+      })(TestComponent);
+
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
+
+      store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
+
+      clock.tick(1100);
+
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
+
+      expect(fakeApi.callCount).to.equal(0);
+
+      store.dispatch(startRefresh('test-loader', {
+        apiCall: fakeApi,
+        timeout: 1000,
+        loadImmediately: true,
+        props: {},
+      }));
+
+      expect(fakeApi.callCount).to.equal(1);
+
+      clock.restore();
+    });
   });
 
   describe('reinitialize', () => {
