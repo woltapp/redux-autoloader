@@ -109,7 +109,7 @@ export default function reduxAutoloader({
           this.props.initialize(getReducerName(this.props));
         }
 
-        if (reloadOnMount) {
+        if (this.props.hasBeenInitialized && reloadOnMount) {
           this.refresh();
         } else if (cacheExpiresIn &&
           this.props.dataReceivedAt &&
