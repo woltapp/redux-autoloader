@@ -163,6 +163,10 @@ the interval of automatic refreshing. If set to `0` or `undefined`, automatic re
 won't be started.
     - default: `0` (no auto refreshing)
 
+* __`loadOnInitialize`__ _(Bool)_: Control whether to load the data immediately after initialization
+(component mounted).
+    - default: `true`
+
 * __`cacheExpiresIn`__ _(Number)_: Set the data expiration time, leavy empty for no expiration.
 If set, cache expiration will be checked on `componentWillMount`. Use with `reloadOnMount: false` to
 e.g. prevent excessive page loads.
