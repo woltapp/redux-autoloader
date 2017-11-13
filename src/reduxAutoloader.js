@@ -129,9 +129,22 @@ export default function reduxAutoloader({
       }
 
       componentWillReceiveProps(nextProps) {
-        if (!this.props.hasBeenInitialized && nextProps.hasBeenInitialized && loadOnInitialize) {
+        if (!this.props.hasBeenInitialized &&
+          nextProps.hasBeenInitialized &&
+          loadOnInitialize &&
+          !autoRefreshInterval) {
           nextProps.load(getReducerName(nextProps), {
             apiCall,
+            props: this.getMappedProps(nextProps),
+          });
+        } else if (!this.props.hasBeenInitialized &&
+          nextProps.hasBeenInitialized &&
+          autoRefreshInterval &&
+          startOnMount) {
+          nextProps.startRefresh(getReducerName(nextProps), {
+            apiCall,
+            loadImmediately: loadOnInitialize,
+            timeout: autoRefreshInterval,
             props: this.getMappedProps(nextProps),
           });
         } else if (this.props.hasBeenInitialized && !nextProps.hasBeenInitialized) {
