@@ -22,7 +22,7 @@ export const getErrorReceivedAt = (state, loaderName) =>
   getLoaderState(state)[loaderName].errorReceivedAt;
 
 export const getUpdatedAt = (state, loaderName) =>
-  getLoaderState(state)[loaderName].errorReceivedAt;
+  getLoaderState(state)[loaderName].updatedAt;
 
 export const createMemoizedGetData = () => {
   let memData;
