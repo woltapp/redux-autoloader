@@ -16,6 +16,7 @@ import {
   getDataReceivedAt,
   getError,
   getErrorReceivedAt,
+  getUpdatedAt,
   createMemoizedGetData,
 } from './selectors';
 
@@ -75,6 +76,7 @@ export default function reduxAutoloader({
       dataReceivedAt: getDataReceivedAt(state, reducerName),
       error: getError(state, reducerName),
       errorReceivedAt: getErrorReceivedAt(state, reducerName),
+      updatedAt: getUpdatedAt(state, reducerName),
     });
   }, {
     initialize: actions.initialize,
@@ -94,6 +96,7 @@ export default function reduxAutoloader({
         stopRefresh: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
         passedProps: PropTypes.object,
+        updatedAt: PropTypes.number,
 
         // exposed props
         error: PropTypes.any,
@@ -112,9 +115,9 @@ export default function reduxAutoloader({
         if (this.props.hasBeenInitialized && reloadOnMount) {
           this.refresh();
         } else if (cacheExpiresIn &&
-          this.props.dataReceivedAt &&
+          this.props.updatedAt &&
           !this.props.isLoading &&
-          cacheIsStale(this.props.dataReceivedAt, cacheExpiresIn)) {
+          cacheIsStale(this.props.updatedAt, cacheExpiresIn)) {
           this.refresh();
         }
 
@@ -157,9 +160,9 @@ export default function reduxAutoloader({
             props: this.getMappedProps(nextProps),
           });
         } else if (cacheExpiresIn &&
-          nextProps.dataReceivedAt &&
+          nextProps.updatedAt &&
           !nextProps.isLoading &&
-          cacheIsStale(nextProps.dataReceivedAt, cacheExpiresIn)) {
+          cacheIsStale(nextProps.updatedAt, cacheExpiresIn)) {
           nextProps.load(getReducerName(nextProps), {
             apiCall,
             props: this.getMappedProps(nextProps),

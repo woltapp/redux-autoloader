@@ -13,6 +13,7 @@ const initialState = {
   loading: false,
   data: undefined,
   error: undefined,
+  updatedAt: undefined,
 };
 
 function reducer(state = {}, action) {
@@ -37,6 +38,7 @@ function reducer(state = {}, action) {
         dataReceivedAt: action.payload.dataReceivedAt,
         error: undefined,
         errorReceivedAt: undefined,
+        updatedAt: action.payload.dataReceivedAt,
       };
 
     case FETCH_DATA_FAILURE:
@@ -45,6 +47,7 @@ function reducer(state = {}, action) {
         loading: false,
         errorReceivedAt: action.payload.errorReceivedAt,
         error: action.payload.error,
+        updatedAt: action.payload.errorReceivedAt,
       };
 
     case START_REFRESH:
