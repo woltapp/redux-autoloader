@@ -157,8 +157,8 @@ export default function reduxAutoloader({
             props: this.getMappedProps(nextProps),
           });
         } else if (cacheExpiresIn &&
-          this.props.dataReceivedAt &&
-          !this.props.isLoading &&
+          nextProps.dataReceivedAt &&
+          !nextProps.isLoading &&
           cacheIsStale(nextProps.dataReceivedAt, cacheExpiresIn)) {
           nextProps.load(getReducerName(nextProps), {
             apiCall,
