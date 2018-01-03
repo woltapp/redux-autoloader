@@ -11,11 +11,12 @@ import { assert } from './utils';
 
 const hashTable = {};
 
-export const collection = (options, mapStateToProps) => {
+export const collection = (options, mapStateToProps = state => state) => {
   const name = options.name;
 
   assert(name, 'name is required');
   assert(typeof name === 'function' || typeof name === 'string', 'name must be a function or a string');
+  assert(typeof mapStateToProps === 'function', 'selector must be a function');
 
   const getReducerName = typeof name === 'function' ? name : () => name;
 
