@@ -131,6 +131,27 @@ const ConnectedComponent = reduxAutoloader({
 })(ExampleComponent);
 ```
 
+#### Reload (refresh) all active loaders
+
+To create a "refresh all" button, simply use `collection` HOC instead of `reduxAutoloader` one. It has the same signature.
+
+```jsx
+import { collection } from 'redux-autoloader';
+
+const ConnectedComponent = collection(options)(ExampleComponent);
+```
+
+Then you can create a refresh button like using `withCollection` that passes a global `.refresh()` method as a prop.
+
+```jsx
+import { withCollection } from 'redux-autoloader';
+
+const ExampleComponent = ({ refresh }) => {
+  return <button onClick={refresh} />Reload</button>;
+};
+
+const ReloadComoponent = withCollection(ExampleComponent);
+```
 
 ## API Documentation
 
