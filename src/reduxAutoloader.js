@@ -126,11 +126,11 @@ export default function reduxAutoloader({
           this.refresh();
         }
 
-        if (startOnMount && autoRefreshInterval) {
+        if (this.props.hasBeenInitialized && startOnMount && autoRefreshInterval) {
           this.debugLog('startRefresh: on mount with autoRefreshInterval');
           this.props.startRefresh(getReducerName(this.props), {
             apiCall,
-            loadImmediately: loadOnInitialize,
+            loadImmediately: reloadOnMount,
             timeout: autoRefreshInterval,
             props: this.getMappedProps(this.props),
           });
