@@ -38,22 +38,27 @@ export function* fetchData(action) {
 }
 
 export function* autoRefresh(action) {
-  while (true) {
-    if (action.payload.loadImmediately) {
-      yield call(fetchData, action);
-    }
+  if (action.payload.loadImmediately) {
+    yield call(fetchData, action);
+  }
 
+  while (true) {
     const loaderState = yield select(getLoaderState);
     const interval = action.payload.newAutoRefreshInterval
       ? action.payload.newAutoRefreshInterval
       : loaderState[action.meta.loader].config.autoRefreshInterval;
 
-    yield race([
-      call(delay, interval),
-      take(act => act.type === LOAD && act.meta.loader === action.meta.loader),
-    ]);
+    const {
+      delayed,
+      loadAction,
+    } = yield race({
+      delayed: call(delay, interval),
+      loadAction: take(act => act.type === LOAD && act.meta.loader === action.meta.loader),
+    });
 
-    if (!action.payload.loadImmediately) {
+    if (loadAction) {
+      yield call(fetchData, loadAction);
+    } else if (delayed) {
       yield call(fetchData, action);
     }
   }
