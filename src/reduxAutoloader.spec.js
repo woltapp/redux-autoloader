@@ -342,7 +342,7 @@ describe('reduxAutoloader', () => {
 
       store.dispatch(startRefresh('test-loader', {
         apiCall: fakeApi,
-        timeout: 1000,
+        newAutoRefreshInterval: 1000,
         loadImmediately: true,
         props: {},
       }));

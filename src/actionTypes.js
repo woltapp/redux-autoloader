@@ -6,3 +6,4 @@ export const START_REFRESH = '@@redux-autoloader/START_REFRESH';
 export const STOP_REFRESH = '@@redux-autoloader/STOP_REFRESH';
 export const LOAD = '@@redux-autoloader/LOAD';
 export const RESET = '@@redux-autoloader/RESET';
+export const SET_CONFIG = '@@redux-autoloader/SET_CONFIG';

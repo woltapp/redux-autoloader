@@ -158,10 +158,11 @@ if you do not want load on mount and you don't want to start autorefreshing auto
 (if `autoRefreshInterval` is set).
     - default: `true` (enable refresh on mount and start auto refreshing)
 
-* __`autoRefreshInterval`__ _(Number)_: Provide an integer in milliseconds to define
-the interval of automatic refreshing. If set to `0` or `undefined`, automatic refresh
-won't be started.
+* __`autoRefreshInterval`__ _(Number|Function -> Number)_: Provide an integer in milliseconds to define
+the interval of automatic refreshing. You can define also a function to return interval dynamically based on
+props. If set to `0` or `undefined`, automatic refresh won't be started.
     - default: `0` (no auto refreshing)
+    - example: `autoRefreshInterval: props => props.interval`
 
 * __`loadOnInitialize`__ _(Bool)_: Control whether to load the data immediately after initialization
 (component mounted).

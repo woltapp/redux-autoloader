@@ -7,10 +7,11 @@ import {
   STOP_REFRESH,
   LOAD,
   RESET,
+  SET_CONFIG,
 } from './actionTypes';
 
-export const initialize = loader =>
-  ({ type: INITIALIZE, meta: { loader } });
+export const initialize = (loader, config) =>
+  ({ type: INITIALIZE, meta: { loader }, payload: { config } });
 
 export const fetchDataRequest = (loader, { apiCall, props }) =>
   ({ type: FETCH_DATA_REQUEST, meta: { loader }, payload: { apiCall, props } });
@@ -25,10 +26,15 @@ export const fetchDataFailure = (loader, { error }) => ({
   error: true,
 });
 
-export const startRefresh = (loader, { apiCall, timeout, props, loadImmediately }) => ({
+export const startRefresh = (loader, {
+  apiCall,
+  newAutoRefreshInterval,
+  props,
+  loadImmediately,
+}) => ({
   type: START_REFRESH,
   meta: { loader },
-  payload: { apiCall, timeout, props, loadImmediately },
+  payload: { apiCall, newAutoRefreshInterval, props, loadImmediately },
 });
 
 export const stopRefresh = loader =>
@@ -39,3 +45,9 @@ export const load = (loader, { apiCall, props }) =>
 
 export const reset = loader =>
   ({ type: RESET, meta: { loader } });
+
+export const setConfig = (loader, config) => ({
+  type: SET_CONFIG,
+  meta: { loader },
+  payload: config,
+});

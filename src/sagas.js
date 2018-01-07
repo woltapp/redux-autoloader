@@ -1,6 +1,15 @@
 /* eslint-disable no-constant-condition, no-loop-func */
 import { delay } from 'redux-saga';
-import { takeEvery, race, call, put, take, cancel, fork } from 'redux-saga/effects';
+import {
+  takeEvery,
+  race,
+  call,
+  put,
+  take,
+  cancel,
+  fork,
+  select,
+} from 'redux-saga/effects';
 
 import {
   START_REFRESH,
@@ -13,6 +22,7 @@ import {
   fetchDataSuccess,
   fetchDataFailure,
 } from './actions';
+import { getLoaderState } from './selectors';
 
 export function* fetchData(action) {
   yield put(fetchDataRequest(action.meta.loader, {
@@ -34,8 +44,13 @@ export function* autoRefresh(action) {
       yield call(fetchData, action);
     }
 
+    const loaderState = yield select(getLoaderState);
+    const interval = action.payload.newAutoRefreshInterval
+      ? action.payload.newAutoRefreshInterval
+      : loaderState[action.meta.loader].config.autoRefreshInterval;
+
     yield race([
-      call(delay, action.payload.timeout),
+      call(delay, interval),
       take(act => act.type === LOAD && act.meta.loader === action.meta.loader),
     ]);
 

@@ -6,6 +6,7 @@ import {
   START_REFRESH,
   STOP_REFRESH,
   RESET,
+  SET_CONFIG,
 } from './actionTypes';
 
 const initialState = {
@@ -19,7 +20,10 @@ const initialState = {
 function reducer(state = {}, action) {
   switch (action.type) {
     case INITIALIZE:
-      return initialState;
+      return {
+        ...initialState,
+        config: action.payload.config,
+      };
 
     case RESET:
       return undefined;
@@ -60,6 +64,15 @@ function reducer(state = {}, action) {
       return {
         ...state,
         refreshing: false,
+      };
+
+    case SET_CONFIG:
+      return {
+        ...state,
+        config: {
+          ...state.config,
+          ...action.payload,
+        },
       };
 
     default:

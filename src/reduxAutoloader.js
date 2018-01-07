@@ -52,8 +52,13 @@ export default function reduxAutoloader({
   assert(typeof reloadOnMount === 'boolean', 'reloadOnMount must be a boolean');
   assert(typeof resetOnUnmount === 'boolean', 'resetOnUnmount must be a boolean');
   assert(typeof pureConnect === 'boolean', 'pureConnect must be a boolean');
-  assert(typeof reload === 'function', 'reload must be a boolean');
   assert(typeof reinitialize === 'function', 'reinitialize must be a boolean');
+  assert(typeof reload === 'function', 'reload must be a boolean');
+
+  if (autoRefreshInterval) {
+    assert(typeof autoRefreshInterval === 'function' || typeof autoRefreshInterval === 'number',
+      'autoRefreshInterval must be a function or a number');
+  }
 
   if (apiCall) {
     assert(apiCall, 'apiCall must be a function');
@@ -62,6 +67,9 @@ export default function reduxAutoloader({
   const getData = createMemoizedGetData();
 
   const getReducerName = typeof name === 'function' ? name : () => name;
+  const getAutoRefreshInterval = typeof autoRefreshInterval === 'function'
+    ? autoRefreshInterval
+    : () => autoRefreshInterval;
 
   const connector = connect((state, props) => {
     const reducerName = getReducerName(props);
@@ -86,6 +94,7 @@ export default function reduxAutoloader({
     startRefresh: actions.startRefresh,
     stopRefresh: actions.stopRefresh,
     reset: actions.reset,
+    setConfig: actions.setConfig,
   }, null, { pure: pureConnect });
 
   return (WrappedComponent) => {
@@ -97,6 +106,7 @@ export default function reduxAutoloader({
         startRefresh: PropTypes.func.isRequired,
         stopRefresh: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
+        setConfig: PropTypes.func.isRequired,
         passedProps: PropTypes.object,
         updatedAt: PropTypes.number,
 
@@ -112,7 +122,9 @@ export default function reduxAutoloader({
       componentWillMount() {
         if (!this.props.hasBeenInitialized) {
           this.debugLog('initialize: on mount');
-          this.props.initialize(getReducerName(this.props));
+          this.props.initialize(getReducerName(this.props), {
+            autoRefreshInterval: getAutoRefreshInterval(this.props),
+          });
         }
 
         if (this.props.hasBeenInitialized && reloadOnMount) {
@@ -126,18 +138,28 @@ export default function reduxAutoloader({
           this.refresh();
         }
 
-        if (this.props.hasBeenInitialized && startOnMount && autoRefreshInterval) {
+        if (this.props.hasBeenInitialized && startOnMount && getAutoRefreshInterval(this.props)) {
           this.debugLog('startRefresh: on mount with autoRefreshInterval');
           this.props.startRefresh(getReducerName(this.props), {
             apiCall,
             loadImmediately: reloadOnMount,
-            timeout: autoRefreshInterval,
             props: this.getMappedProps(this.props),
           });
         }
       }
 
       componentWillReceiveProps(nextProps) {
+        /* config setting */
+
+        if (getAutoRefreshInterval(this.props) !== getAutoRefreshInterval(nextProps)) {
+          this.debugLog('setConfig: autoRefreshInterval changed');
+          this.props.setConfig(getReducerName(nextProps), {
+            autoRefreshInterval: getAutoRefreshInterval(nextProps),
+          });
+        }
+
+        /* initialization, startRefresh and load */
+
         if (!this.props.hasBeenInitialized &&
           nextProps.hasBeenInitialized &&
           loadOnInitialize &&
@@ -155,12 +177,13 @@ export default function reduxAutoloader({
           nextProps.startRefresh(getReducerName(nextProps), {
             apiCall,
             loadImmediately: loadOnInitialize,
-            timeout: autoRefreshInterval,
             props: this.getMappedProps(nextProps),
           });
         } else if (this.props.hasBeenInitialized && !nextProps.hasBeenInitialized) {
           this.debugLog('initialize: was unitialized');
-          nextProps.initialize(getReducerName(nextProps));
+          nextProps.initialize(getReducerName(nextProps), {
+            autoRefreshInterval: getAutoRefreshInterval(nextProps),
+          });
         } else if (!this.props.hasBeenInitialized) {
           return;
         } else if (reload(this.props, nextProps)) {
@@ -230,12 +253,12 @@ export default function reduxAutoloader({
         });
       }
 
-      startAutoRefresh = (newTimeout, opts = {}) => {
+      startAutoRefresh = (newInterval, opts = {}) => {
         const loadImmediately = opts.loadImmediately || true;
 
         this.props.startRefresh(getReducerName(this.props), {
           apiCall,
-          timeout: newTimeout || autoRefreshInterval,
+          newAutoRefreshInterval: newInterval,
           props: this.getMappedProps(this.props),
           loadImmediately,
         });
