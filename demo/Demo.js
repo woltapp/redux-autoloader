@@ -64,7 +64,14 @@ const createMounter = (name, Wrapped) => class MountedComponent extends Componen
     const { mounted } = this.state;
 
     return (
-      <div style={{ border: '1px solid lightgrey', padding: 20, ...this.props.style }}>
+      <div
+        style={{
+          background: 'white',
+          border: '1px solid lightgrey',
+          padding: 20,
+          ...this.props.style,
+        }}
+      >
         <div style={{ borderBottom: '1px solid lightgrey', paddingBottom: 10 }}>
           <span style={{ marginRight: 20 }}>
             {name}
@@ -76,8 +83,12 @@ const createMounter = (name, Wrapped) => class MountedComponent extends Componen
         </div>
 
         <div style={{ marginTop: 20 }}>
-          {!!mounted && (
+          {mounted ? (
             <Wrapped {...this.props} />
+          ) : (
+            <span style={{ color: '#777' }}>
+              [loader unmounted]
+            </span>
           )}
         </div>
       </div>
