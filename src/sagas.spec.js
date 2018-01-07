@@ -1,4 +1,4 @@
-import { cancel, call, put, fork, takeEvery } from 'redux-saga/effects';
+import { cancel, call, put, fork } from 'redux-saga/effects';
 import { createMockTask } from 'redux-saga/utils';
 
 import {
