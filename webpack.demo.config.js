@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   devtool: process.env !== 'PRODUCTION' ? '#cheap-module-source-map' : false,
@@ -33,4 +34,11 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        REDUX_AUTOLOADER_DEBUG: JSON.stringify(process.env.REDUX_AUTOLOADER_DEBUG),
+      },
+    }),
+  ],
 };

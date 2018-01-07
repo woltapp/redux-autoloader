@@ -20,6 +20,8 @@ import {
   createMemoizedGetData,
 } from './selectors';
 
+const REDUX_AUTOLOADER_DEBUG = process.env.REDUX_AUTOLOADER_DEBUG === 'true';
+
 function cacheIsStale(dataReceivedAt, expiresIn) {
   if (!dataReceivedAt || !expiresIn) {
     return true;
@@ -109,19 +111,23 @@ export default function reduxAutoloader({
 
       componentWillMount() {
         if (!this.props.hasBeenInitialized) {
+          this.debugLog('initialize: on mount');
           this.props.initialize(getReducerName(this.props));
         }
 
         if (this.props.hasBeenInitialized && reloadOnMount) {
+          this.debugLog('reload: on mount');
           this.refresh();
         } else if (cacheExpiresIn &&
           this.props.updatedAt &&
           !this.props.isLoading &&
           cacheIsStale(this.props.updatedAt, cacheExpiresIn)) {
+          this.debugLog('reload: cache is stale');
           this.refresh();
         }
 
         if (startOnMount && autoRefreshInterval) {
+          this.debugLog('startRefresh: on mount with autoRefreshInterval');
           this.props.startRefresh(getReducerName(this.props), {
             apiCall,
             loadImmediately: loadOnInitialize,
@@ -136,6 +142,7 @@ export default function reduxAutoloader({
           nextProps.hasBeenInitialized &&
           loadOnInitialize &&
           !autoRefreshInterval) {
+          this.debugLog('load: on initialization without autoRefresh');
           nextProps.load(getReducerName(nextProps), {
             apiCall,
             props: this.getMappedProps(nextProps),
@@ -144,6 +151,7 @@ export default function reduxAutoloader({
           nextProps.hasBeenInitialized &&
           autoRefreshInterval &&
           startOnMount) {
+          this.debugLog('startRefresh: after initialized');
           nextProps.startRefresh(getReducerName(nextProps), {
             apiCall,
             loadImmediately: loadOnInitialize,
@@ -151,10 +159,12 @@ export default function reduxAutoloader({
             props: this.getMappedProps(nextProps),
           });
         } else if (this.props.hasBeenInitialized && !nextProps.hasBeenInitialized) {
+          this.debugLog('initialize: was unitialized');
           nextProps.initialize(getReducerName(nextProps));
         } else if (!this.props.hasBeenInitialized) {
           return;
         } else if (reload(this.props, nextProps)) {
+          this.debugLog('load: reload');
           nextProps.load(getReducerName(nextProps), {
             apiCall,
             props: this.getMappedProps(nextProps),
@@ -163,25 +173,30 @@ export default function reduxAutoloader({
           nextProps.updatedAt &&
           !nextProps.isLoading &&
           cacheIsStale(nextProps.updatedAt, cacheExpiresIn)) {
+          this.debugLog('load: cache is stale');
           nextProps.load(getReducerName(nextProps), {
             apiCall,
             props: this.getMappedProps(nextProps),
           });
         } else if (reinitialize(this.props, nextProps)) {
+          this.debugLog('reset: reinitialize');
           nextProps.reset(getReducerName(nextProps));
         }
 
         if (getReducerName(this.props) !== getReducerName(nextProps)) {
+          this.debugLog('stopRefresh: name changed');
           this.stopAutoRefresh(this.props);
         }
       }
 
       componentWillUnmount() {
         if (this.props.isRefreshing) {
+          this.debugLog('stopRefresh: was refreshing and unmounted');
           this.props.stopRefresh(getReducerName(this.props));
         }
 
         if (resetOnUnmount) {
+          this.debugLog('reset: on unmount');
           this.props.reset(getReducerName(this.props));
         }
       }
@@ -201,6 +216,12 @@ export default function reduxAutoloader({
 
         return { ...props.passedProps, ...mapStateToProps(exposedProps, props.passedProps) };
       }
+
+      /* eslint-disable no-console */
+      debugLog = REDUX_AUTOLOADER_DEBUG
+        ? msg => console.info(`${getReducerName(this.props)} | ${msg}`)
+        : () => {};
+      /* eslint-enable no-console */
 
       refresh = () => {
         this.props.load(getReducerName(this.props), {
