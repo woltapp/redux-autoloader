@@ -141,9 +141,8 @@ export default function reduxAutoloader({
         if (this.props.hasBeenInitialized && startOnMount && getAutoRefreshInterval(this.props)) {
           this.debugLog('startRefresh: on mount with autoRefreshInterval');
           this.props.startRefresh(getReducerName(this.props), {
-            apiCall,
+            apiCall: () => apiCall(this.getMappedProps(this.props)),
             loadImmediately: reloadOnMount,
-            props: this.getMappedProps(this.props),
           });
         }
       }
@@ -166,8 +165,7 @@ export default function reduxAutoloader({
           !autoRefreshInterval) {
           this.debugLog('load: on initialization without autoRefresh');
           nextProps.load(getReducerName(nextProps), {
-            apiCall,
-            props: this.getMappedProps(nextProps),
+            apiCall: () => apiCall(this.getMappedProps(nextProps)),
           });
         } else if (!this.props.hasBeenInitialized &&
           nextProps.hasBeenInitialized &&
@@ -175,9 +173,8 @@ export default function reduxAutoloader({
           startOnMount) {
           this.debugLog('startRefresh: after initialized');
           nextProps.startRefresh(getReducerName(nextProps), {
-            apiCall,
+            apiCall: () => apiCall(this.getMappedProps(nextProps)),
             loadImmediately: loadOnInitialize,
-            props: this.getMappedProps(nextProps),
           });
         } else if (this.props.hasBeenInitialized && !nextProps.hasBeenInitialized) {
           this.debugLog('initialize: was unitialized');
@@ -189,8 +186,7 @@ export default function reduxAutoloader({
         } else if (reload(this.props, nextProps)) {
           this.debugLog('load: reload');
           nextProps.load(getReducerName(nextProps), {
-            apiCall,
-            props: this.getMappedProps(nextProps),
+            apiCall: () => apiCall(this.getMappedProps(nextProps)),
           });
         } else if (cacheExpiresIn &&
           nextProps.updatedAt &&
@@ -198,8 +194,7 @@ export default function reduxAutoloader({
           cacheIsStale(nextProps.updatedAt, cacheExpiresIn)) {
           this.debugLog('load: cache is stale');
           nextProps.load(getReducerName(nextProps), {
-            apiCall,
-            props: this.getMappedProps(nextProps),
+            apiCall: () => apiCall(this.getMappedProps(nextProps)),
           });
         } else if (reinitialize(this.props, nextProps)) {
           this.debugLog('reset: reinitialize');
@@ -248,8 +243,7 @@ export default function reduxAutoloader({
 
       refresh = () => {
         this.props.load(getReducerName(this.props), {
-          apiCall,
-          props: this.getMappedProps(this.props),
+          apiCall: () => apiCall(this.getMappedProps(this.props)),
         });
       }
 
@@ -257,9 +251,8 @@ export default function reduxAutoloader({
         const loadImmediately = opts.loadImmediately || true;
 
         this.props.startRefresh(getReducerName(this.props), {
-          apiCall,
+          apiCall: () => apiCall(this.getMappedProps(this.props)),
           newAutoRefreshInterval: newInterval,
-          props: this.getMappedProps(this.props),
           loadImmediately,
         });
       }

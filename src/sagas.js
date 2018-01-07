@@ -27,11 +27,10 @@ import { getLoaderState } from './selectors';
 export function* fetchData(action) {
   yield put(fetchDataRequest(action.meta.loader, {
     apiCall: action.payload.apiCall,
-    props: action.payload.props,
   }));
 
   try {
-    const data = yield call(action.payload.apiCall, action.payload.props);
+    const data = yield call(action.payload.apiCall);
     yield put(fetchDataSuccess(action.meta.loader, { data }));
   } catch (err) {
     yield put(fetchDataFailure(action.meta.loader, { error: err }));

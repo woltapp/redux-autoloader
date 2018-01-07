@@ -13,8 +13,8 @@ import {
 export const initialize = (loader, config) =>
   ({ type: INITIALIZE, meta: { loader }, payload: { config } });
 
-export const fetchDataRequest = (loader, { apiCall, props }) =>
-  ({ type: FETCH_DATA_REQUEST, meta: { loader }, payload: { apiCall, props } });
+export const fetchDataRequest = (loader, { apiCall }) =>
+  ({ type: FETCH_DATA_REQUEST, meta: { loader }, payload: { apiCall } });
 
 export const fetchDataSuccess = (loader, { data }) =>
   ({ type: FETCH_DATA_SUCCESS, meta: { loader }, payload: { data, dataReceivedAt: Date.now() } });
@@ -29,19 +29,18 @@ export const fetchDataFailure = (loader, { error }) => ({
 export const startRefresh = (loader, {
   apiCall,
   newAutoRefreshInterval,
-  props,
   loadImmediately,
 }) => ({
   type: START_REFRESH,
   meta: { loader },
-  payload: { apiCall, newAutoRefreshInterval, props, loadImmediately },
+  payload: { apiCall, newAutoRefreshInterval, loadImmediately },
 });
 
 export const stopRefresh = loader =>
   ({ type: STOP_REFRESH, meta: { loader } });
 
-export const load = (loader, { apiCall, props }) =>
-  ({ type: LOAD, meta: { loader }, payload: { apiCall, props } });
+export const load = (loader, { apiCall }) =>
+  ({ type: LOAD, meta: { loader }, payload: { apiCall } });
 
 export const reset = loader =>
   ({ type: RESET, meta: { loader } });

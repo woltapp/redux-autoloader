@@ -21,16 +21,14 @@ import rootSaga, {
 
 describe('fetchData', () => {
   const fakeApi = sinon.stub().returns(Promise.resolve('testresult'));
-  const mockProps = { testProp: 'test' };
 
   it('should call api', () => {
-    const gen = fetchData(load('test-loader', { apiCall: fakeApi, props: mockProps }));
+    const gen = fetchData(load('test-loader', { apiCall: fakeApi }));
 
     expect(gen.next().value).to.eql(put(fetchDataRequest('test-loader', {
       apiCall: fakeApi,
-      props: mockProps,
     })));
-    expect(gen.next().value).to.eql(call(fakeApi, mockProps));
+    expect(gen.next().value).to.eql(call(fakeApi));
   });
 });
 
