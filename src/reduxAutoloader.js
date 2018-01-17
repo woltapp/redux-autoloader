@@ -127,7 +127,9 @@ export default function reduxAutoloader({
           });
         }
 
-        if (this.props.hasBeenInitialized && reloadOnMount) {
+        if (this.props.hasBeenInitialized &&
+          reloadOnMount &&
+          !this.props.isLoading) {
           this.debugLog('reload: on mount');
           this.refresh();
         } else if (cacheExpiresIn &&
@@ -162,6 +164,7 @@ export default function reduxAutoloader({
         if (!this.props.hasBeenInitialized &&
           nextProps.hasBeenInitialized &&
           loadOnInitialize &&
+          !nextProps.isLoading &&
           !autoRefreshInterval) {
           this.debugLog('load: on initialization without autoRefresh');
           nextProps.load(getReducerName(nextProps), {
