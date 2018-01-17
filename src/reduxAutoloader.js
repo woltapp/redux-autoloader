@@ -43,6 +43,7 @@ export default function reduxAutoloader({
   reinitialize = () => false,
   reload = () => false,
   pureConnect = true,
+  renderUninitialized = false,
   /* eslint-enable react/prop-types */
 }, mapStateToProps = state => state) {
   assert(name, 'name is required');
@@ -265,13 +266,11 @@ export default function reduxAutoloader({
       }
 
       render() {
-        if (!this.props.hasBeenInitialized) {
-          return null;
+        if (this.props.hasBeenInitialized || renderUninitialized) {
+          return <WrappedComponent {...this.getMappedProps(this.props)} />;
         }
 
-        return (
-          <WrappedComponent {...this.getMappedProps(this.props)} />
-        );
+        return null;
       }
     }
 

@@ -200,6 +200,9 @@ re-mounting the component with a clean loader state.
 * __`pureConnect`__ _(Bool)_: This library uses `connect()` from `react-redux` under hood. Set `pureConnect: false` if you wish to prevent `connect()` from controlling component updates based on props.
     - default: `true`
 
+* __`renderUninitialized`__ _(Bool)_: Render wrapped component when the loader state has not yet been initialized.
+    - default: `false`
+
 ### mapStateToProps
 
 `mapStateToProps` is an optional function to provide if you want to
