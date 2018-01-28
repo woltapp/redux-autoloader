@@ -145,7 +145,7 @@ export default function reduxAutoloader({
           this.debugLog('startRefresh: on mount with autoRefreshInterval');
           this.props.startRefresh(getReducerName(this.props), {
             apiCall: () => apiCall(this.getMappedProps(this.props)),
-            loadImmediately: reloadOnMount,
+            loadImmediately: (this.props.updatedAt && reloadOnMount) || loadOnInitialize,
           });
         }
       }
