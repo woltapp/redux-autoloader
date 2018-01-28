@@ -1,6 +1,6 @@
 {
   "name": "redux-autoloader",
-  "version": "1.0.0-rc.12",
+  "version": "1.0.0-rc.13",
   "description": "A higher order component for declarative data loading in React and Redux.",
   "main": "./lib/redux-autoloader.js",
   "scripts": {
