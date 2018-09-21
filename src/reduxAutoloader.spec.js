@@ -3,8 +3,11 @@
   react/prefer-stateless-function,
   no-unused-expressions,
   react/require-default-props,
+  prefer-destructuring,
 */
+import '@babel/polyfill';
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 import createSagaMiddleware from 'redux-saga';
@@ -54,7 +57,7 @@ const renderAndGetProps = (component, config, store) => {
 
 class TestComponent extends Component {
   static propTypes = {
-    className: React.PropTypes.string,
+    className: PropTypes.string,
   }
 
   render() {

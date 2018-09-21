@@ -1,3 +1,4 @@
+import '@babel/polyfill';
 import { cancel, call, put, fork } from 'redux-saga/effects';
 import { createMockTask } from 'redux-saga/utils';
 
