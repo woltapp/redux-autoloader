@@ -5,7 +5,7 @@ module.exports = {
   devtool: process.env !== 'PRODUCTION' ? '#cheap-module-source-map' : false,
   entry: {
     demo: [
-      'babel-polyfill',
+      '@babel/polyfill',
       './demo/index.js',
     ],
   },

@@ -120,6 +120,12 @@ export default function reduxAutoloader({
         isRefreshing: PropTypes.bool,
       }
 
+      /* eslint-disable no-console */
+      debugLog = REDUX_AUTOLOADER_DEBUG
+        ? msg => console.info(`${getReducerName(this.props)} | ${msg}`)
+        : () => {};
+      /* eslint-enable no-console */
+
       componentWillMount() {
         if (!this.props.hasBeenInitialized) {
           this.debugLog('initialize: on mount');
@@ -239,12 +245,6 @@ export default function reduxAutoloader({
 
         return { ...props.passedProps, ...mapStateToProps(exposedProps, props.passedProps) };
       }
-
-      /* eslint-disable no-console */
-      debugLog = REDUX_AUTOLOADER_DEBUG
-        ? msg => console.info(`${getReducerName(this.props)} | ${msg}`)
-        : () => {};
-      /* eslint-enable no-console */
 
       refresh = () => {
         this.props.load(getReducerName(this.props), {

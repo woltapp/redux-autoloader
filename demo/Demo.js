@@ -32,15 +32,15 @@ const LoaderView = ({
     </pre>
 
     <div style={{ marginTop: 20 }}>
-      <button onClick={refresh}>
+      <button type="button" onClick={refresh}>
         Refresh
       </button>
 
-      <button onClick={() => startAutoRefresh(2000)}>
+      <button type="button" onClick={() => startAutoRefresh(2000)}>
         Start refresh
       </button>
 
-      <button onClick={stopAutoRefresh}>
+      <button type="button" onClick={stopAutoRefresh}>
         Stop refresh
       </button>
     </div>
@@ -77,7 +77,7 @@ const createMounter = (name, Wrapped) => class MountedComponent extends Componen
             {name}
           </span>
 
-          <button onClick={() => this.setState({ mounted: !mounted })}>
+          <button type="button" onClick={() => this.setState({ mounted: !mounted })}>
             {mounted ? 'Unmount' : 'Mount'}
           </button>
         </div>
