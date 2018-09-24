@@ -10,7 +10,8 @@
     "demo": "webpack-dev-server --config webpack.demo.config.js --content-base demo/",
     "prepublish": "npm run build",
     "start": "npm run demo",
-    "analyze-bundle-size": "ANALYZE_BUNDLE=true npm run build"
+    "analyze-bundle-size": "ANALYZE_BUNDLE=true npm run build",
+    "prettier:all": "prettier --write '**/*.*(js|jsx|css|scss|scssm|json|md)'"
   },
   "author": "nygardk",
   "license": "MIT",
@@ -55,8 +56,11 @@
     "eslint-plugin-import": "2.14.0",
     "eslint-plugin-jsx-a11y": "6.1.1",
     "eslint-plugin-react": "7.11.1",
+    "husky": "1.0.0-rc.15",
     "jest": "23.6.0",
     "mocha": "3.4.2",
+    "precise-commits": "1.0.2",
+    "prettier": "1.14.3",
     "prop-types": "^15.5.10",
     "react": "15.5.4",
     "react-addons-test-utils": "15.5.1",
@@ -74,5 +78,10 @@
   "dependencies": {
     "@babel/runtime": "7.0.0",
     "react-display-name": "^0.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "precise-commits"
+    }
   }
 }
