@@ -9,40 +9,40 @@
 
 1. Install via NPM
 
-  ```
-  npm install --save redux-autoloader
-  ```
+```
+npm install --save redux-autoloader
+```
 
 2. Register reducer in your root reducer
 
-  The reducer must be mounted at `reduxAutoloader`.
+The reducer must be mounted at `reduxAutoloader`.
 
-  ```js
-  import { reducer as reduxAutoloaderReducer } from 'redux-autoloader';
+```js
+import { reducer as reduxAutoloaderReducer } from 'redux-autoloader';
 
-  const rootReducer = combineReducers({
-    ...
-    reduxAutoloader: reduxAutoloaderReducer,
-    ...
-  });
-  ```
+const rootReducer = combineReducers({
+  ...
+  reduxAutoloader: reduxAutoloaderReducer,
+  ...
+});
+```
 
 3. Register saga
 
-  ```js
-  import { saga as reduxAutoloaderSaga } from 'redux-autoloader';
+```js
+import { saga as reduxAutoloaderSaga } from 'redux-autoloader';
 
-  ...
-  sagaMiddleware.run(reduxAutoloaderSaga);
-  ...
-  ```
+...
+sagaMiddleware.run(reduxAutoloaderSaga);
+...
+```
 
 ## Peer dependencies
 
-* react
-* redux
-* react-redux
-* redux-saga
+- react
+- redux
+- react-redux
+- redux-saga
 
 ## Try demo locally
 
@@ -102,9 +102,9 @@ const ConnectedComponent = reduxAutoloader({
 const ConnectedComponent = reduxAutoloader({
   name: 'example-loader-2',
   apiCall: yourDataFech,
-  reloadOnMount: false,       // Prevent triggering reload on mount, default: true
-  cacheExpiresIn: 60000,      // Set cache expiration time: data will be
-                              // loaded on mount after 1 minute even if reloadOnMount=false
+  reloadOnMount: false, // Prevent triggering reload on mount, default: true
+  cacheExpiresIn: 60000, // Set cache expiration time: data will be
+  // loaded on mount after 1 minute even if reloadOnMount=false
 })(ExampleComponent);
 ```
 
@@ -114,11 +114,10 @@ const ConnectedComponent = reduxAutoloader({
 const ConnectedComponent = reduxAutoloader({
   name: 'example-loader-3',
   apiCall: yourDataFech,
-  autoRefreshInterval: 5000,  // Set loader to automatically refetch data every 5 seconds.
-                              // Can be stopped by calling props.stopRefresh().
+  autoRefreshInterval: 5000, // Set loader to automatically refetch data every 5 seconds.
+  // Can be stopped by calling props.stopRefresh().
 })(ExampleComponent);
 ```
-
 
 #### Reload (refresh) when prop changes
 
@@ -127,10 +126,9 @@ const ConnectedComponent = reduxAutoloader({
   name: 'example-loader-3',
   apiCall: yourDataFech,
   reload: (props, nextProps) => props.myProp !== nextProps.myProp, // Watch when `myProp`
-                                                                   // changes and reload
+  // changes and reload
 })(ExampleComponent);
 ```
-
 
 ## API Documentation
 
@@ -139,69 +137,56 @@ first _(required)_ argument and `mapStateToProps` (Function) as second _(optiona
 
 ### Options
 
-* __`name`__ _(String|Function -> String)_: A unique name for the loader (string) or a function that
-returns a name. If you make multiple loaders with the same name, they will share the same
-data (state).
-    - always required
-    - example: `name: 'all-users'`
-    - example: ``name: props => `user-loader-${props.userId}` ``
+- **`name`** _(String|Function -> String)_: A unique name for the loader (string) or a function that
+  returns a name. If you make multiple loaders with the same name, they will share the same
+  data (state). - always required - example: `name: 'all-users'` - example: `` name: props => `user-loader-${props.userId}` ``
 
-* __`apiCall`__ _(Function -> Promise)_: A function that returns a promise, which is usually
-an API call. If you want to provide arguments for the function, simply wrap it in a function
-that gets `props` as an argument. If left undefined, `reduxAutoloader` can be used
-simply as a connector to the data state.
-    - example: `apiCall: props => fetchUser(props.userId)`
-    - default: `undefined`
+- **`apiCall`** _(Function -> Promise)_: A function that returns a promise, which is usually
+  an API call. If you want to provide arguments for the function, simply wrap it in a function
+  that gets `props` as an argument. If left undefined, `reduxAutoloader` can be used
+  simply as a connector to the data state. - example: `apiCall: props => fetchUser(props.userId)` - default: `undefined`
 
-* __`startOnMount`__ _(Bool)_: Control the behavior of the loader on mount. Set to `false`
-if you do not want load on mount and you don't want to start autorefreshing automatically
-(if `autoRefreshInterval` is set).
-    - default: `true` (enable refresh on mount and start auto refreshing)
+- **`startOnMount`** _(Bool)_: Control the behavior of the loader on mount. Set to `false`
+  if you do not want load on mount and you don't want to start autorefreshing automatically
+  (if `autoRefreshInterval` is set). - default: `true` (enable refresh on mount and start auto refreshing)
 
-* __`autoRefreshInterval`__ _(Number|Function -> Number)_: Provide an integer in milliseconds to define
-the interval of automatic refreshing. You can define also a function to return interval dynamically based on
-props. If set to `0` or `undefined`, automatic refresh won't be started.
-    - default: `0` (no auto refreshing)
-    - example: `autoRefreshInterval: props => props.interval`
+- **`autoRefreshInterval`** _(Number|Function -> Number)_: Provide an integer in milliseconds to define
+  the interval of automatic refreshing. You can define also a function to return interval dynamically based on
+  props. If set to `0` or `undefined`, automatic refresh won't be started. - default: `0` (no auto refreshing) - example: `autoRefreshInterval: props => props.interval`
 
-* __`loadOnInitialize`__ _(Bool)_: Control whether to load the data immediately after initialization
-(component mounted).
-    - default: `true`
+- **`loadOnInitialize`** _(Bool)_: Control whether to load the data immediately after initialization
+  (component mounted). - default: `true`
 
-* __`cacheExpiresIn`__ _(Number)_: Set the data expiration time, leavy empty for no expiration.
-If set, cache expiration will be checked on `componentWillMount`. Use with `reloadOnMount: false` to
-e.g. prevent excessive page loads.
-    - default: `0` (no expiration)
+- **`cacheExpiresIn`** _(Number)_: Set the data expiration time, leavy empty for no expiration.
+  If set, cache expiration will be checked on `componentWillMount`. Use with `reloadOnMount: false` to
+  e.g. prevent excessive page loads. - default: `0` (no expiration)
 
-* __`reloadOnMount`__ _(Bool)_: Control whether reload is done always on component re-mount.
-    - default: `true`
+- **`reloadOnMount`** _(Bool)_: Control whether reload is done always on component re-mount.
 
-* __`resetOnUnmount`__ _(Bool)_: Control whether to completely reset data-loader state on unmount.
-    - default: `true`
+  - default: `true`
 
-* __`reload`__ _(Function -> Bool)_: This function is run when the decorated component
-receives new props. The function takes `props` (current props) as first argument
-and `nextProps` as second. When the function returns `true`, it performs a refresh on the
-data loader. Compared to `reinitialize` (below), this won't reset the loader state.
-    - example: `reload: (props, nextProps) => props.userId !== nextProps.userId`
-    - default: `() => false`
-    - __! NOTE !__ setting `reload: () => true` or any other function that returns
-    always true will cause an infinite loop (do not do this!)
+- **`resetOnUnmount`** _(Bool)_: Control whether to completely reset data-loader state on unmount.
 
-* __`reinitialize`__ _(Function -> Bool)_: This function is run when the decorated component
-receives new props. The function takes `props` (current props) as first argument
-and `nextProps` as second. When the function returns `true`, it resets the data loader; effectively
-re-mounting the component with a clean loader state.
-    - example: `reinitialize: (props, nextProps) => props.userId !== nextProps.userId`
-    - default: `() => false`
-    - __! NOTE !__ setting `reinitialize: () => true` or any other function that returns
-    always true will cause an infinite loop (do not do this!)
+  - default: `true`
 
-* __`pureConnect`__ _(Bool)_: This library uses `connect()` from `react-redux` under hood. Set `pureConnect: false` if you wish to prevent `connect()` from controlling component updates based on props.
-    - default: `true`
+- **`reload`** _(Function -> Bool)_: This function is run when the decorated component
+  receives new props. The function takes `props` (current props) as first argument
+  and `nextProps` as second. When the function returns `true`, it performs a refresh on the
+  data loader. Compared to `reinitialize` (below), this won't reset the loader state. - example: `reload: (props, nextProps) => props.userId !== nextProps.userId` - default: `() => false` - **! NOTE !** setting `reload: () => true` or any other function that returns
+  always true will cause an infinite loop (do not do this!)
 
-* __`renderUninitialized`__ _(Bool)_: Render wrapped component when the loader state has not yet been initialized.
-    - default: `false`
+- **`reinitialize`** _(Function -> Bool)_: This function is run when the decorated component
+  receives new props. The function takes `props` (current props) as first argument
+  and `nextProps` as second. When the function returns `true`, it resets the data loader; effectively
+  re-mounting the component with a clean loader state. - example: `reinitialize: (props, nextProps) => props.userId !== nextProps.userId` - default: `() => false` - **! NOTE !** setting `reinitialize: () => true` or any other function that returns
+  always true will cause an infinite loop (do not do this!)
+
+- **`pureConnect`** _(Bool)_: This library uses `connect()` from `react-redux` under hood. Set `pureConnect: false` if you wish to prevent `connect()` from controlling component updates based on props.
+
+  - default: `true`
+
+- **`renderUninitialized`** _(Bool)_: Render wrapped component when the loader state has not yet been initialized.
+  - default: `false`
 
 ### mapStateToProps
 
@@ -221,16 +206,15 @@ const ConnectedComponent = reduxAutoloader(options, state => ({
 
 Props provided to the wrapped component.
 
-* __`isLoading`__ _(Bool)_: `true` if `apiCall` is triggered and not yet resolved.
-* __`isRefreshing`__ _(Bool)_: `true` if loader is auto-refreshing.
-* __`data`__ _(any)_: Resolved data received from the apiCall Promise.
-* __`dataReceivedAt`__ _(Number)_: Datetime as UNIX epoch when data was received.
-* __`error`__ _(any)_: Rejected data received from the apiCall Promise.
-* __`errorReceivedAt`__ _(Number)_: Datetime as UNIX epoch when error was received.
-* __`refresh`__ _(Function)_: Call to refresh (reload) data immediately.
-* __`startAutoRefresh`__ _(Function)_: Call to start auto-refreshing. Takes `refreshInterval` as first optional argument. Takes `options` object as second argument. Set `options={ loadImmediately: false }` to start refreshing but skip first load.
-* __`stopAutoRefresh`__ _(Function)_: Call to stop auto-refreshing.
-
+- **`isLoading`** _(Bool)_: `true` if `apiCall` is triggered and not yet resolved.
+- **`isRefreshing`** _(Bool)_: `true` if loader is auto-refreshing.
+- **`data`** _(any)_: Resolved data received from the apiCall Promise.
+- **`dataReceivedAt`** _(Number)_: Datetime as UNIX epoch when data was received.
+- **`error`** _(any)_: Rejected data received from the apiCall Promise.
+- **`errorReceivedAt`** _(Number)_: Datetime as UNIX epoch when error was received.
+- **`refresh`** _(Function)_: Call to refresh (reload) data immediately.
+- **`startAutoRefresh`** _(Function)_: Call to start auto-refreshing. Takes `refreshInterval` as first optional argument. Takes `options` object as second argument. Set `options={ loadImmediately: false }` to start refreshing but skip first load.
+- **`stopAutoRefresh`** _(Function)_: Call to stop auto-refreshing.
 
 ## License
 

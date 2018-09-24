@@ -2,7 +2,8 @@ const reducerMountPoint = 'reduxAutoloader';
 
 export const getLoaderState = state => state[reducerMountPoint];
 
-export const isInitialized = (state, loaderName) => !!getLoaderState(state)[loaderName];
+export const isInitialized = (state, loaderName) =>
+  !!getLoaderState(state)[loaderName];
 
 export const isLoading = (state, loaderName) =>
   getLoaderState(state)[loaderName].loading;

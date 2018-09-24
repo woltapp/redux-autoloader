@@ -80,7 +80,7 @@ function reducer(state = {}, action) {
   }
 }
 
-export default function (state = {}, action) {
+export default function(state = {}, action) {
   if (!action.meta || !action.meta.loader) {
     return state;
   }
