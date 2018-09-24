@@ -11,12 +11,7 @@ import {
   select,
 } from 'redux-saga/effects';
 
-import {
-  START_REFRESH,
-  STOP_REFRESH,
-  LOAD,
-  RESET,
-} from './actionTypes';
+import { START_REFRESH, STOP_REFRESH, LOAD, RESET } from './actionTypes';
 import {
   fetchDataRequest,
   fetchDataSuccess,
@@ -25,9 +20,11 @@ import {
 import { getLoaderState } from './selectors';
 
 export function* fetchData(action) {
-  yield put(fetchDataRequest(action.meta.loader, {
-    apiCall: action.payload.apiCall,
-  }));
+  yield put(
+    fetchDataRequest(action.meta.loader, {
+      apiCall: action.payload.apiCall,
+    })
+  );
 
   try {
     const data = yield call(action.payload.apiCall);
@@ -48,12 +45,11 @@ export function* autoRefresh(action) {
       ? action.payload.newAutoRefreshInterval
       : loaderState[action.meta.loader].config.autoRefreshInterval;
 
-    const {
-      delayed,
-      loadAction,
-    } = yield race({
+    const { delayed, loadAction } = yield race({
       delayed: call(delay, interval),
-      loadAction: take(act => act.type === LOAD && act.meta.loader === action.meta.loader),
+      loadAction: take(
+        act => act.type === LOAD && act.meta.loader === action.meta.loader
+      ),
     });
 
     if (loadAction) {
@@ -78,7 +74,10 @@ export const createDataLoaderFlow = (taskConf = {}) => {
       tasks[action.meta.loader].autoRefresh = yield fork(autoRefresh, action);
     }
 
-    if ((action.type === RESET || action.type === STOP_REFRESH) && loaderTasks.autoRefresh) {
+    if (
+      (action.type === RESET || action.type === STOP_REFRESH) &&
+      loaderTasks.autoRefresh
+    ) {
       yield cancel(loaderTasks.autoRefresh);
       delete loaderTasks.autoRefresh;
     }

@@ -2,18 +2,8 @@ import sinon from 'sinon';
 import { cancel, call, put, fork } from 'redux-saga/effects';
 import { createMockTask } from 'redux-saga/utils';
 
-import {
-  load,
-  fetchDataRequest,
-  startRefresh,
-  stopRefresh,
-} from './actions';
-import {
-  START_REFRESH,
-  STOP_REFRESH,
-  LOAD,
-  RESET,
-} from './actionTypes';
+import { load, fetchDataRequest, startRefresh, stopRefresh } from './actions';
+import { START_REFRESH, STOP_REFRESH, LOAD, RESET } from './actionTypes';
 import rootSaga, {
   createDataLoaderFlow,
   fetchData,
@@ -26,9 +16,13 @@ describe('fetchData', () => {
   test('should call api', () => {
     const gen = fetchData(load('test-loader', { apiCall: fakeApi }));
 
-    expect(gen.next().value).toEqual(put(fetchDataRequest('test-loader', {
-      apiCall: fakeApi,
-    })));
+    expect(gen.next().value).toEqual(
+      put(
+        fetchDataRequest('test-loader', {
+          apiCall: fakeApi,
+        })
+      )
+    );
     expect(gen.next().value).toEqual(call(fakeApi));
   });
 });
@@ -40,23 +34,34 @@ describe('rootSaga', () => {
     gen = rootSaga();
   });
 
-  test(
-    'should take every START_REFRESH, STOP_REFRESH, LOAD and RESET action',
-    () => {
-      const val = gen.next().value;
+  test('should take every START_REFRESH, STOP_REFRESH, LOAD and RESET action', () => {
+    const val = gen.next().value;
 
-      expect(val).toHaveProperty('FORK');
-      expect(val.FORK.args[0]).toEqual([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
-    }
-  );
+    expect(val).toHaveProperty('FORK');
+    expect(val.FORK.args[0]).toEqual([
+      START_REFRESH,
+      STOP_REFRESH,
+      LOAD,
+      RESET,
+    ]);
+  });
 });
 
 describe('dataLoaderFlow', () => {
   const fakeApi = sinon.stub().returns(Promise.resolve('testresult'));
   const mockProps = { testProp: 'test' };
-  const startRefreshAction = startRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
-  const stopRefreshAction = stopRefresh('test-loader', { apiCall: fakeApi, props: mockProps });
-  const loadAction = load('test-loader', { apiCall: fakeApi, props: mockProps });
+  const startRefreshAction = startRefresh('test-loader', {
+    apiCall: fakeApi,
+    props: mockProps,
+  });
+  const stopRefreshAction = stopRefresh('test-loader', {
+    apiCall: fakeApi,
+    props: mockProps,
+  });
+  const loadAction = load('test-loader', {
+    apiCall: fakeApi,
+    props: mockProps,
+  });
 
   let gen;
   let dataLoaderFlow;
