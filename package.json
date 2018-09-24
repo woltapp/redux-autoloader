@@ -76,6 +76,8 @@
   },
   "dependencies": {
     "@babel/runtime": "7.0.0",
+    "eslint-plugin-jest": "21.22.1",
+    "eslint-plugin-prettier": "2.6.2",
     "react-display-name": "^0.2.0"
   },
   "husky": {
