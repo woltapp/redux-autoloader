@@ -9,7 +9,8 @@
     "test:watch": "jest --watchAll",
     "demo": "webpack-dev-server --config webpack.demo.config.js --content-base demo/",
     "prepublish": "npm run build",
-    "start": "npm run demo"
+    "start": "npm run demo",
+    "analyze-bundle-size": "ANALYZE_BUNDLE=true npm run build"
   },
   "author": "nygardk",
   "license": "MIT",
