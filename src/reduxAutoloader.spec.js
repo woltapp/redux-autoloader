@@ -5,11 +5,11 @@
   react/require-default-props,
   prefer-destructuring,
 */
-import '@babel/polyfill';
+import sinon from 'sinon';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 import createSagaMiddleware from 'redux-saga';
 import { Provider } from 'react-redux';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
@@ -70,21 +70,21 @@ describe('reduxAutoloader', () => {
     mockApi.reset();
   });
 
-  it('should be a decorator function', () => {
-    expect(reduxAutoloader).to.be.a('function');
+  test('should be a decorator function', () => {
+    expect(typeof reduxAutoloader).toBe('function');
   });
 
-  it('should render without error', () => {
+  test('should render without error', () => {
     expect(() => {
       renderDecorated(() => <div />);
-    }).to.not.throw();
+    }).not.toThrow();
   });
 
-  it('should expose the correct props', () => {
+  test('should expose the correct props', () => {
     const dom = renderDecorated(TestComponent);
     const props = TestUtils.findRenderedComponentWithType(dom, TestComponent).props;
 
-    expect(Object.keys(props).sort()).to.deep.equal([
+    expect(Object.keys(props).sort()).toEqual([
       'data',
       'dataReceivedAt',
       'isLoading',
@@ -97,23 +97,23 @@ describe('reduxAutoloader', () => {
     ].sort());
   });
 
-  it('should pass also props from parent', () => {
+  test('should pass also props from parent', () => {
     const WrappedTestComponent = props => <TestComponent {...props} className="test" />;
     const dom = renderDecorated(WrappedTestComponent);
     const props = TestUtils.findRenderedComponentWithType(dom, TestComponent).props;
 
-    expect(Object.keys(props)).to.include('className');
-    expect(Object.keys(props)).to.include('data');
-    expect(props.className).to.equal('test');
+    expect(Object.keys(props)).toContain('className');
+    expect(Object.keys(props)).toContain('data');
+    expect(props.className).toBe('test');
   });
 
-  it('should call api on mount', () => {
+  test('should call api on mount', () => {
     const fakeApi = sinon.stub().returns(new Promise(() => {}));
     renderDecorated(TestComponent, { apiCall: fakeApi });
-    expect(fakeApi.callCount).to.equal(1);
+    expect(fakeApi.callCount).toBe(1);
   });
 
-  it('should call api on re-render if reloadOnMount is true', () => {
+  test('should call api on re-render if reloadOnMount is true', () => {
     const fakeApi = sinon.stub().returns('somedata');
     const store = makeStore();
     const Decorated = reduxAutoloader({
@@ -134,10 +134,10 @@ describe('reduxAutoloader', () => {
       </Provider>,
     );
 
-    expect(fakeApi.callCount).to.equal(2);
+    expect(fakeApi.callCount).toBe(2);
   });
 
-  it('should not call api on re-render if reloadOnMount is false', () => {
+  test('should not call api on re-render if reloadOnMount is false', () => {
     const fakeApi = sinon.stub().returns(new Promise(() => {}));
     const store = makeStore();
     const Decorated = reduxAutoloader({
@@ -158,101 +158,110 @@ describe('reduxAutoloader', () => {
       </Provider>,
     );
 
-    expect(fakeApi.callCount).to.equal(1);
+    expect(fakeApi.callCount).toBe(1);
   });
 
-  it('should not call api on re-render if reloadOnMount is false and cache is valid', () => {
-    const clock = sinon.useFakeTimers(Date.now());
+  test(
+    'should not call api on re-render if reloadOnMount is false and cache is valid',
+    () => {
+      const clock = sinon.useFakeTimers(Date.now());
 
-    const fakeApi = sinon.stub().returns(new Promise(() => {}));
-    const store = makeStore();
-    const Decorated = reduxAutoloader({
-      name: 'test-loader',
-      apiCall: fakeApi,
-      reloadOnMount: false,
-      cacheExpiresIn: 1000,
-    })(TestComponent);
+      const fakeApi = sinon.stub().returns(new Promise(() => {}));
+      const store = makeStore();
+      const Decorated = reduxAutoloader({
+        name: 'test-loader',
+        apiCall: fakeApi,
+        reloadOnMount: false,
+        cacheExpiresIn: 1000,
+      })(TestComponent);
 
-    TestUtils.renderIntoDocument(
-      <Provider store={store}>
-        <Decorated />
-      </Provider>,
-    );
-    store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
-    clock.tick(500);
-    TestUtils.renderIntoDocument(
-      <Provider store={store}>
-        <Decorated />
-      </Provider>,
-    );
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
+      store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
+      clock.tick(500);
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
 
-    expect(fakeApi.callCount).to.equal(1);
+      expect(fakeApi.callCount).toBe(1);
 
-    clock.restore();
-  });
+      clock.restore();
+    }
+  );
 
-  it('should call api on re-render if reloadOnMount is false and cache is stale', () => {
-    const clock = sinon.useFakeTimers(Date.now());
+  test(
+    'should call api on re-render if reloadOnMount is false and cache is stale',
+    () => {
+      const clock = sinon.useFakeTimers(Date.now());
 
-    const store = makeStore();
-    const Decorated = reduxAutoloader({
-      name: 'test-loader',
-      apiCall: mockApi,
-      reloadOnMount: false,
-      cacheExpiresIn: 1000,
-    })(TestComponent);
+      const store = makeStore();
+      const Decorated = reduxAutoloader({
+        name: 'test-loader',
+        apiCall: mockApi,
+        reloadOnMount: false,
+        cacheExpiresIn: 1000,
+      })(TestComponent);
 
-    TestUtils.renderIntoDocument(
-      <Provider store={store}>
-        <Decorated />
-      </Provider>,
-    );
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
 
-    clock.tick(1100);
+      clock.tick(1100);
 
-    TestUtils.renderIntoDocument(
-      <Provider store={store}>
-        <Decorated />
-      </Provider>,
-    );
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
 
-    expect(mockApi.callCount).to.equal(2);
+      expect(mockApi.callCount).toBe(2);
 
-    clock.restore();
-  });
+      clock.restore();
+    }
+  );
 
-  it('should not call api on re-render if reloadOnMount is false and cache is not stale', () => {
-    const clock = sinon.useFakeTimers(Date.now());
+  test(
+    'should not call api on re-render if reloadOnMount is false and cache is not stale',
+    () => {
+      const clock = sinon.useFakeTimers(Date.now());
 
-    const store = makeStore();
-    const Decorated = reduxAutoloader({
-      name: 'test-loader',
-      apiCall: mockApi,
-      reloadOnMount: false,
-      cacheExpiresIn: 1000,
-    })(TestComponent);
+      const store = makeStore();
+      const Decorated = reduxAutoloader({
+        name: 'test-loader',
+        apiCall: mockApi,
+        reloadOnMount: false,
+        cacheExpiresIn: 1000,
+      })(TestComponent);
 
-    TestUtils.renderIntoDocument(
-      <Provider store={store}>
-        <Decorated />
-      </Provider>,
-    );
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
 
-    clock.tick(900);
+      clock.tick(900);
 
-    TestUtils.renderIntoDocument(
-      <Provider store={store}>
-        <Decorated />
-      </Provider>,
-    );
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <Decorated />
+        </Provider>,
+      );
 
-    expect(mockApi.callCount).to.equal(1);
+      expect(mockApi.callCount).toBe(1);
 
-    clock.restore();
-  });
+      clock.restore();
+    }
+  );
 
   describe('On initial mount', () => {
-    it('should load when only apiCall is set', () => {
+    test('should load when only apiCall is set', () => {
       const store = makeStore();
       const Decorated = reduxAutoloader({
         name: 'test-loader',
@@ -265,10 +274,10 @@ describe('reduxAutoloader', () => {
         </Provider>,
       );
 
-      expect(mockApi.callCount).to.equal(1);
+      expect(mockApi.callCount).toBe(1);
     });
 
-    it('should load when autoRefreshInterval is set', () => {
+    test('should load when autoRefreshInterval is set', () => {
       const store = makeStore();
       const Decorated = reduxAutoloader({
         name: 'test-loader',
@@ -282,82 +291,88 @@ describe('reduxAutoloader', () => {
         </Provider>,
       );
 
-      expect(mockApi.callCount).to.equal(1);
+      expect(mockApi.callCount).toBe(1);
     });
 
-    it('should load when reloadOnMount=true, resetOnUnmount=true, cacheExpiresIn and autoRefreshInterval are set', () => {
-      const clock = sinon.useFakeTimers(Date.now());
+    test(
+      'should load when reloadOnMount=true, resetOnUnmount=true, cacheExpiresIn and autoRefreshInterval are set',
+      () => {
+        const clock = sinon.useFakeTimers(Date.now());
 
-      const fakeApi = sinon.stub().returns('somedata');
-      const store = makeStore();
-      const Decorated = reduxAutoloader({
-        name: 'test-loader',
-        reloadOnMount: true,
-        resetOnUnmount: true,
-        cacheExpiresIn: 120000,
-        autoRefreshInterval: 120000,
-        apiCall: fakeApi,
-      })(TestComponent);
+        const fakeApi = sinon.stub().returns('somedata');
+        const store = makeStore();
+        const Decorated = reduxAutoloader({
+          name: 'test-loader',
+          reloadOnMount: true,
+          resetOnUnmount: true,
+          cacheExpiresIn: 120000,
+          autoRefreshInterval: 120000,
+          apiCall: fakeApi,
+        })(TestComponent);
 
-      TestUtils.renderIntoDocument(
-        <Provider store={store}>
-          <Decorated />
-        </Provider>,
-      );
+        TestUtils.renderIntoDocument(
+          <Provider store={store}>
+            <Decorated />
+          </Provider>,
+        );
 
-      expect(fakeApi.callCount).to.equal(1);
+        expect(fakeApi.callCount).toBe(1);
 
-      clock.restore();
-    });
+        clock.restore();
+      }
+    );
 
-    it('should not call api after mount if startOnMount=false, reloadOnMount=false, loadOnInitialize=false ' +
-    'and autoRefreshInterval=false but should after manual start', () => {
-      const clock = sinon.useFakeTimers(Date.now());
+    test(
+      'should not call api after mount if startOnMount=false, reloadOnMount=false, loadOnInitialize=false ' +
+      'and autoRefreshInterval=false but should after manual start',
+      () => {
+        const clock = sinon.useFakeTimers(Date.now());
 
-      const fakeApi = sinon.stub().returns('somedata');
-      const store = makeStore();
-      const Decorated = reduxAutoloader({
-        name: 'test-loader',
-        startOnMount: false,
-        reloadOnMount: false,
-        loadOnInitialize: false,
-        autoRefreshInterval: false,
-        apiCall: fakeApi,
-      })(TestComponent);
+        const fakeApi = sinon.stub().returns('somedata');
+        const store = makeStore();
+        const Decorated = reduxAutoloader({
+          name: 'test-loader',
+          startOnMount: false,
+          reloadOnMount: false,
+          loadOnInitialize: false,
+          autoRefreshInterval: false,
+          apiCall: fakeApi,
+        })(TestComponent);
 
-      TestUtils.renderIntoDocument(
-        <Provider store={store}>
-          <Decorated />
-        </Provider>,
-      );
+        TestUtils.renderIntoDocument(
+          <Provider store={store}>
+            <Decorated />
+          </Provider>,
+        );
 
-      store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
+        store.dispatch(fetchDataSuccess('test-loader', { data: 'test-result-data' }));
 
-      clock.tick(1100);
+        clock.tick(1100);
 
-      TestUtils.renderIntoDocument(
-        <Provider store={store}>
-          <Decorated />
-        </Provider>,
-      );
+        TestUtils.renderIntoDocument(
+          <Provider store={store}>
+            <Decorated />
+          </Provider>,
+        );
 
-      expect(fakeApi.callCount).to.equal(0);
+        expect(fakeApi.callCount).toBe(0);
 
-      store.dispatch(startRefresh('test-loader', {
-        apiCall: fakeApi,
-        newAutoRefreshInterval: 1000,
-        loadImmediately: true,
-        props: {},
-      }));
+        store.dispatch(startRefresh('test-loader', {
+          apiCall: fakeApi,
+          newAutoRefreshInterval: 1000,
+          loadImmediately: true,
+          props: {},
+        }));
 
-      expect(fakeApi.callCount).to.equal(1);
+        expect(fakeApi.callCount).toBe(1);
 
-      clock.restore();
-    });
+        clock.restore();
+      }
+    );
   });
 
   describe('reinitialize', () => {
-    it('should reset and reload when reinitialize returns true', () => {
+    test('should reset and reload when reinitialize returns true', () => {
       const renderNode = document.createElement('div');
 
       const fakeApi = sinon.stub().returns('somedata');
@@ -381,10 +396,10 @@ describe('reduxAutoloader', () => {
         </Provider>
       ), renderNode);
 
-      expect(fakeApi.callCount).to.equal(2);
+      expect(fakeApi.callCount).toBe(2);
     });
 
-    it('should not reset nor reload when reinitialize returns false', () => {
+    test('should not reset nor reload when reinitialize returns false', () => {
       const renderNode = document.createElement('div');
 
       const fakeApi = sinon.stub().returns('somedata');
@@ -408,12 +423,12 @@ describe('reduxAutoloader', () => {
         </Provider>
       ), renderNode);
 
-      expect(fakeApi.callCount).to.equal(1);
+      expect(fakeApi.callCount).toBe(1);
     });
   });
 
   describe('refresh prop', () => {
-    it('should fire action to reload from api', () => {
+    test('should fire action to reload from api', () => {
       const fakeApi = sinon.stub().returns('somedata');
       const store = makeStore();
       sinon.spy(store, 'dispatch');
@@ -424,26 +439,26 @@ describe('reduxAutoloader', () => {
       props.refresh();
 
       const dispatchedAction = store.dispatch.firstCall.returnValue;
-      expect(dispatchedAction.type).to.equal(actionTypes.LOAD);
-      expect(store.dispatch.callCount).to.equal(1);
-      expect(fakeApi.callCount).to.equal(1);
+      expect(dispatchedAction.type).toBe(actionTypes.LOAD);
+      expect(store.dispatch.callCount).toBe(1);
+      expect(fakeApi.callCount).toBe(1);
     });
   });
 
   describe('isLoading prop', () => {
-    it('should be "false" by default', () => {
+    test('should be "false" by default', () => {
       const props = renderAndGetProps(TestComponent);
-      expect(props.isLoading).to.equal(false);
+      expect(props.isLoading).toBe(false);
     });
 
-    it('should be "true" when data loading is triggered', () => {
+    test('should be "true" when data loading is triggered', () => {
       const fakeApi = () => new Promise(() => {});
       const dom = renderDecorated(TestComponent, { apiCall: fakeApi });
       const props = TestUtils.findRenderedComponentWithType(dom, TestComponent).props;
-      expect(props.isLoading).to.equal(true);
+      expect(props.isLoading).toBe(true);
     });
 
-    it('should be "false" when data loading is finished', () => {
+    test('should be "false" when data loading is finished', () => {
       const store = makeStore();
 
       const fakeApi = () => new Promise(() => {});
@@ -465,21 +480,21 @@ describe('reduxAutoloader', () => {
 
       const props = TestUtils.findRenderedComponentWithType(dom, TestComponent).props;
 
-      expect(props.isLoading).to.equal(false);
+      expect(props.isLoading).toBe(false);
     });
   });
 
   describe('data prop', () => {
-    it('should be "undefined" by default', () => {
+    test('should be "undefined" by default', () => {
       const props = renderAndGetProps(TestComponent);
-      expect(props.data).to.equal(undefined);
+      expect(props.data).toBe(undefined);
     });
   });
 
   describe('dataReceivedAt prop', () => {
-    it('should be "undefined" by default', () => {
+    test('should be "undefined" by default', () => {
       const props = renderAndGetProps(TestComponent);
-      expect(props.dataReceivedAt).to.equal(undefined);
+      expect(props.dataReceivedAt).toBe(undefined);
     });
   });
 });

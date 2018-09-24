@@ -1,4 +1,4 @@
-import '@babel/polyfill';
+import sinon from 'sinon';
 import { cancel, call, put, fork } from 'redux-saga/effects';
 import { createMockTask } from 'redux-saga/utils';
 
@@ -23,29 +23,32 @@ import rootSaga, {
 describe('fetchData', () => {
   const fakeApi = sinon.stub().returns(Promise.resolve('testresult'));
 
-  it('should call api', () => {
+  test('should call api', () => {
     const gen = fetchData(load('test-loader', { apiCall: fakeApi }));
 
-    expect(gen.next().value).to.eql(put(fetchDataRequest('test-loader', {
+    expect(gen.next().value).toEqual(put(fetchDataRequest('test-loader', {
       apiCall: fakeApi,
     })));
-    expect(gen.next().value).to.eql(call(fakeApi));
+    expect(gen.next().value).toEqual(call(fakeApi));
   });
 });
 
 describe('rootSaga', () => {
   let gen;
 
-  before(() => {
+  beforeAll(() => {
     gen = rootSaga();
   });
 
-  it('should take every START_REFRESH, STOP_REFRESH, LOAD and RESET action', () => {
-    const val = gen.next().value;
+  test(
+    'should take every START_REFRESH, STOP_REFRESH, LOAD and RESET action',
+    () => {
+      const val = gen.next().value;
 
-    expect(val).to.include.key('FORK');
-    expect(val.FORK.args[0]).to.eql([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
-  });
+      expect(val).toHaveProperty('FORK');
+      expect(val.FORK.args[0]).toEqual([START_REFRESH, STOP_REFRESH, LOAD, RESET]);
+    }
+  );
 });
 
 describe('dataLoaderFlow', () => {
@@ -67,8 +70,8 @@ describe('dataLoaderFlow', () => {
       gen = dataLoaderFlow(startRefreshAction);
     });
 
-    it('should fork autoRefresh', () => {
-      expect(gen.next().value).to.eql(fork(autoRefresh, startRefreshAction));
+    test('should fork autoRefresh', () => {
+      expect(gen.next().value).toEqual(fork(autoRefresh, startRefreshAction));
     });
   });
 
@@ -77,14 +80,14 @@ describe('dataLoaderFlow', () => {
       gen = dataLoaderFlow(stopRefreshAction);
     });
 
-    it('should cancel autoRefresh task if it is running', () => {
+    test('should cancel autoRefresh task if it is running', () => {
       const mockLoaderTask = createMockTask();
       mockLoaderTask.name = 'autoRefresh';
       mockLoaderTask.meta = { loader: 'test-loader' };
       const startGen = dataLoaderFlow(startRefreshAction);
       startGen.next();
       startGen.next(mockLoaderTask);
-      expect(gen.next(stopRefreshAction).value).to.eql(cancel(mockLoaderTask));
+      expect(gen.next(stopRefreshAction).value).toEqual(cancel(mockLoaderTask));
     });
   });
 
@@ -93,16 +96,16 @@ describe('dataLoaderFlow', () => {
       gen = dataLoaderFlow(loadAction);
     });
 
-    it('should call fetchData if autoRefresh is not running', () => {
-      expect(gen.next().value).to.eql(call(fetchData, loadAction));
+    test('should call fetchData if autoRefresh is not running', () => {
+      expect(gen.next().value).toEqual(call(fetchData, loadAction));
     });
 
-    it('should not call fetchData if autoRefresh is running', () => {
+    test('should not call fetchData if autoRefresh is running', () => {
       const startGen = dataLoaderFlow(startRefreshAction);
       startGen.next(startRefreshAction);
       startGen.next(startRefreshAction);
 
-      expect(gen.next().value).to.not.eql(call(fetchData, loadAction));
+      expect(gen.next().value).not.toEqual(call(fetchData, loadAction));
     });
   });
 });
