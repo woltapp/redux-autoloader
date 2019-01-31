@@ -33,6 +33,7 @@ function cacheIsStale(dataReceivedAt, expiresIn) {
 export default function reduxAutoloader(
   {
     /* eslint-disable react/prop-types */
+    debug,
     name,
     apiCall,
     loadOnInitialize = true,
@@ -139,9 +140,10 @@ export default function reduxAutoloader(
       };
 
       /* eslint-disable no-console */
-      debugLog = REDUX_AUTOLOADER_DEBUG
-        ? msg => console.info(`${getReducerName(this.props)} | ${msg}`)
-        : () => {};
+      debugLog =
+        REDUX_AUTOLOADER_DEBUG || debug
+          ? msg => console.info(`${getReducerName(this.props)} | ${msg}`)
+          : () => {};
       /* eslint-enable no-console */
 
       componentWillMount() {
