@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { cancel, call, put, fork } from 'redux-saga/effects';
-import { createMockTask } from 'redux-saga/utils';
+import { createMockTask } from '@redux-saga/testing-utils';
 
 import { load, fetchDataRequest, startRefresh, stopRefresh } from './actions';
 import { START_REFRESH, STOP_REFRESH, LOAD, RESET } from './actionTypes';
@@ -37,8 +37,8 @@ describe('rootSaga', () => {
   test('should take every START_REFRESH, STOP_REFRESH, LOAD and RESET action', () => {
     const val = gen.next().value;
 
-    expect(val).toHaveProperty('FORK');
-    expect(val.FORK.args[0]).toEqual([
+    expect(val.type).toEqual('FORK');
+    expect(val.payload.args[0]).toEqual([
       START_REFRESH,
       STOP_REFRESH,
       LOAD,
