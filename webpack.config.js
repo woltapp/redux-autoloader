@@ -16,6 +16,7 @@ module.exports = {
     react: 'react',
     'react-redux': 'react-redux',
     'redux-saga': 'redux-saga',
+    redux: 'redux',
     'redux-saga/effects': 'redux-saga/effects',
   },
   module: {

@@ -1,6 +1,6 @@
 /* eslint-disable no-constant-condition, no-loop-func */
-import { delay } from 'redux-saga';
 import {
+  delay,
   takeEvery,
   race,
   call,
@@ -46,7 +46,7 @@ export function* autoRefresh(action) {
       : loaderState[action.meta.loader].config.autoRefreshInterval;
 
     const { delayed, loadAction } = yield race({
-      delayed: call(delay, interval),
+      delayed: delay(interval),
       loadAction: take(
         act => act.type === LOAD && act.meta.loader === action.meta.loader
       ),
