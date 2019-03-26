@@ -2,12 +2,13 @@ const path = require('path');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
+  devtool: 'source-map',
   entry: './src/index.js',
   output: {
     publicPath: 'lib/',
     path: path.resolve(__dirname, 'lib'),
     filename: 'redux-autoloader.js',
-    sourceMapFilename: 'redux-autoloader.map',
+    sourceMapFilename: 'redux-autoloader.js.map',
     library: 'redux-autoloader',
     libraryTarget: 'commonjs2',
   },
