@@ -186,76 +186,76 @@ export default function reduxAutoloader(
         }
       }
 
-      componentWillReceiveProps(nextProps) {
+      componentDidUpdate(prevProps) {
         /* config setting */
 
         if (
-          getAutoRefreshInterval(this.props) !==
-          getAutoRefreshInterval(nextProps)
+          getAutoRefreshInterval(prevProps) !==
+          getAutoRefreshInterval(this.props)
         ) {
           this.debugLog('setConfig: autoRefreshInterval changed');
-          this.props.setConfig(getReducerName(nextProps), {
-            autoRefreshInterval: getAutoRefreshInterval(nextProps),
+          prevProps.setConfig(getReducerName(this.props), {
+            autoRefreshInterval: getAutoRefreshInterval(this.props),
           });
         }
 
         /* initialization, startRefresh and load */
 
         if (
-          !this.props.hasBeenInitialized &&
-          nextProps.hasBeenInitialized &&
+          !prevProps.hasBeenInitialized &&
+          this.props.hasBeenInitialized &&
           loadOnInitialize &&
-          !nextProps.isLoading &&
+          !this.props.isLoading &&
           !autoRefreshInterval
         ) {
           this.debugLog('load: on initialization without autoRefresh');
-          nextProps.load(getReducerName(nextProps), {
-            apiCall: () => apiCall(this.getMappedProps(nextProps)),
+          this.props.load(getReducerName(this.props), {
+            apiCall: () => apiCall(this.getMappedProps(this.props)),
           });
         } else if (
-          !this.props.hasBeenInitialized &&
-          nextProps.hasBeenInitialized &&
+          !prevProps.hasBeenInitialized &&
+          this.props.hasBeenInitialized &&
           autoRefreshInterval &&
           startOnMount
         ) {
           this.debugLog('startRefresh: after initialized');
-          nextProps.startRefresh(getReducerName(nextProps), {
-            apiCall: () => apiCall(this.getMappedProps(nextProps)),
+          this.props.startRefresh(getReducerName(this.props), {
+            apiCall: () => apiCall(this.getMappedProps(this.props)),
             loadImmediately: loadOnInitialize,
           });
         } else if (
-          this.props.hasBeenInitialized &&
-          !nextProps.hasBeenInitialized
+          prevProps.hasBeenInitialized &&
+          !this.props.hasBeenInitialized
         ) {
           this.debugLog('initialize: was unitialized');
-          nextProps.initialize(getReducerName(nextProps), {
-            autoRefreshInterval: getAutoRefreshInterval(nextProps),
+          this.props.initialize(getReducerName(this.props), {
+            autoRefreshInterval: getAutoRefreshInterval(this.props),
           });
-        } else if (!this.props.hasBeenInitialized) {
+        } else if (!prevProps.hasBeenInitialized) {
           return;
-        } else if (reload(this.props, nextProps)) {
+        } else if (reload(prevProps, this.props)) {
           this.debugLog('load: reload');
-          nextProps.load(getReducerName(nextProps), {
-            apiCall: () => apiCall(this.getMappedProps(nextProps)),
+          this.props.load(getReducerName(this.props), {
+            apiCall: () => apiCall(this.getMappedProps(this.props)),
           });
         } else if (
           cacheExpiresIn &&
-          nextProps.updatedAt &&
-          !nextProps.isLoading &&
-          cacheIsStale(nextProps.updatedAt, cacheExpiresIn)
+          this.props.updatedAt &&
+          !this.props.isLoading &&
+          cacheIsStale(this.props.updatedAt, cacheExpiresIn)
         ) {
           this.debugLog('load: cache is stale');
-          nextProps.load(getReducerName(nextProps), {
-            apiCall: () => apiCall(this.getMappedProps(nextProps)),
+          this.props.load(getReducerName(this.props), {
+            apiCall: () => apiCall(this.getMappedProps(this.props)),
           });
-        } else if (reinitialize(this.props, nextProps)) {
+        } else if (reinitialize(prevProps, this.props)) {
           this.debugLog('reset: reinitialize');
-          nextProps.reset(getReducerName(nextProps));
+          this.props.reset(getReducerName(this.props));
         }
 
-        if (getReducerName(this.props) !== getReducerName(nextProps)) {
+        if (getReducerName(prevProps) !== getReducerName(this.props)) {
           this.debugLog('stopRefresh: name changed');
-          this.stopAutoRefresh(this.props);
+          this.stopAutoRefresh(prevProps);
         }
       }
 
