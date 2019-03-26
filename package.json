@@ -1,6 +1,6 @@
 {
   "name": "redux-autoloader",
-  "version": "1.0.0-rc.16",
+  "version": "1.0.0-rc.17",
   "description": "A higher order component for declarative data loading in React and Redux.",
   "engines": {
     "node": ">=6.9.0",
