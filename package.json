@@ -2,6 +2,10 @@
   "name": "redux-autoloader",
   "version": "1.0.0-rc.15",
   "description": "A higher order component for declarative data loading in React and Redux.",
+  "engines": {
+    "node": ">=6.9.0",
+    "npm": ">=5.0.0"
+  },
   "main": "./lib/redux-autoloader.js",
   "scripts": {
     "build": "webpack -p --config webpack.config.js --progress --colors",
@@ -9,7 +13,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "demo": "webpack-dev-server --config webpack.demo.config.js --content-base demo/ --mode development",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "start": "npm run demo",
     "analyze-bundle-size": "ANALYZE_BUNDLE=true npm run build",
     "prettier:all": "prettier --write '**/*.*(js|jsx|css|scss|scssm|json|md)'"
