@@ -146,7 +146,7 @@ export default function reduxAutoloader(
           : () => {};
       /* eslint-enable no-console */
 
-      componentWillMount() {
+      componentDidMount() {
         if (!this.props.hasBeenInitialized) {
           this.debugLog('initialize: on mount');
           this.props.initialize(getReducerName(this.props), {
