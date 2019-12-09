@@ -60,7 +60,10 @@ LoaderView.propTypes = {
 
 const createMounter = (name, Wrapped) =>
   class MountedComponent extends Component {
-    state = { mounted: true };
+    constructor(props) {
+      super(props);
+      this.state = { mounted: true };
+    }
 
     render() {
       const { mounted } = this.state;

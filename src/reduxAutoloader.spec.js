@@ -59,14 +59,14 @@ const renderAndGetProps = (component, config, store) => {
 };
 
 class TestComponent extends Component {
-  static propTypes = {
-    className: PropTypes.string,
-  };
-
   render() {
     return <div className={this.props.className} />;
   }
 }
+
+TestComponent.propTypes = {
+  className: PropTypes.string,
+};
 
 describe('reduxAutoloader', () => {
   beforeEach(() => {

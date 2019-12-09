@@ -119,26 +119,6 @@ export default function reduxAutoloader(
 
   return WrappedComponent => {
     class DataComponent extends PureComponent {
-      static propTypes = {
-        hasBeenInitialized: PropTypes.bool.isRequired,
-        initialize: PropTypes.func.isRequired,
-        load: PropTypes.func.isRequired,
-        startRefresh: PropTypes.func.isRequired,
-        stopRefresh: PropTypes.func.isRequired,
-        reset: PropTypes.func.isRequired,
-        setConfig: PropTypes.func.isRequired,
-        passedProps: PropTypes.object,
-        updatedAt: PropTypes.number,
-
-        // exposed props
-        error: PropTypes.any,
-        errorReceivedAt: PropTypes.number,
-        isLoading: PropTypes.bool,
-        data: PropTypes.any,
-        dataReceivedAt: PropTypes.number,
-        isRefreshing: PropTypes.bool,
-      };
-
       /* eslint-disable no-console */
       debugLog =
         REDUX_AUTOLOADER_DEBUG || debug
@@ -318,6 +298,26 @@ export default function reduxAutoloader(
         return null;
       }
     }
+
+    DataComponent.propTypes = {
+      hasBeenInitialized: PropTypes.bool.isRequired,
+      initialize: PropTypes.func.isRequired,
+      load: PropTypes.func.isRequired,
+      startRefresh: PropTypes.func.isRequired,
+      stopRefresh: PropTypes.func.isRequired,
+      reset: PropTypes.func.isRequired,
+      setConfig: PropTypes.func.isRequired,
+      passedProps: PropTypes.object,
+      updatedAt: PropTypes.number,
+
+      // exposed props
+      error: PropTypes.any,
+      errorReceivedAt: PropTypes.number,
+      isLoading: PropTypes.bool,
+      data: PropTypes.any,
+      dataReceivedAt: PropTypes.number,
+      isRefreshing: PropTypes.bool,
+    };
 
     DataComponent.displayName = `reduxAutoloader-${getDisplayName(
       WrappedComponent
